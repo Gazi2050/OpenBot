@@ -1,17 +1,21 @@
 {
-  "name": "openbot-backend",
+  "name": "@openbot/backend",
+  "version": "0.0.1",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "start": "node dist/index.js"
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.14",
+    "@openbot/database": "workspace:*",
+    "@openbot/shared": "workspace:*",
     "hono": "^4.12.23"
   },
   "devDependencies": {
-    "@types/node": "^20.11.17",
+    "@types/node": "^22",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   }
