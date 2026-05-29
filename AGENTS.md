@@ -270,16 +270,16 @@ The frontend proxies `/api` requests to the Hono backend:
 
 ## graphify
 
-This project has a graphify knowledge graph at `graphify-out/`.
+This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.
+
+When the user types `/graphify`, invoke the `skill` tool with `skill: "graphify"` before doing anything else.
 
 Rules:
-
-- Before answering architecture or codebase questions, read `graphify-out/GRAPH_REPORT.md` for god nodes and community structure
-- If `graphify-out/wiki/index.md` exists, navigate it instead of reading raw files
-- For cross-module "how does X relate to Y" questions, prefer `graphify query "<question>"`, `graphify path "<A>" "<B>"`, or `graphify explain "<concept>"` over grep — these traverse the graph's EXTRACTED + INFERRED edges instead of scanning files
-- Before making ANY code change, query the graph to understand the impact area and dependencies
-- After brainstorming or design discussions, validate assumptions against the graph before implementing
-- After modifying code files in this session, run `graphify update .` to keep the graph current (AST-only, no API cost)
+- For codebase questions, first run `graphify query "<question>"` when graphify-out/graph.json exists. Use `graphify path "<A>" "<B>"` for relationships and `graphify explain "<concept>"` for focused concepts. These return a scoped subgraph, usually much smaller than GRAPH_REPORT.md or raw grep output.
+- Dirty graphify-out/ files are expected after hooks or incremental updates; dirty graph files are not a reason to skip graphify. Only skip graphify if the task is about stale or incorrect graph output, or the user explicitly says not to use it.
+- If graphify-out/wiki/index.md exists, use it for broad navigation instead of raw source browsing.
+- Read graphify-out/GRAPH_REPORT.md only for broad architecture review or when query/path/explain do not surface enough context.
+- After modifying code, run `graphify update .` to keep the graph current (AST-only, no API cost).
 
 ## superpowers
 
@@ -287,29 +287,33 @@ Auto-trigger the matching skill based on the task type. Do not ask the user whic
 
 | Task type | Skill to invoke |
 |-----------|----------------|
-| New feature, build request, or adding functionality | `brainstorming` → `writing-plans` → implement |
+| New feature, build request, or adding functionality | `brainstorming` → `writing-plans` → `subagent-driven-development` or `executing-plans` |
 | Bug report, test failure, unexpected behavior | `systematic-debugging` |
 | Code review before merge or after completing work | `requesting-code-review` |
 | Received review feedback to implement | `receiving-code-review` |
 | About to claim work is complete or tests pass | `verification-before-completion` |
+| Starting feature work that needs isolation | `using-git-worktrees` |
+| Implementation complete, ready to integrate | `finishing-a-development-branch` |
+| 2+ independent tasks that can run in parallel | `dispatching-parallel-agents` |
 | Building UI, pages, dashboards, styling | `frontend-design` |
+| Svelte 5 components, runes, snippets | `svelte-code-writer` + `svelte5-best-practices` + `svelte-runes` |
+| SvelteKit remote functions, .remote.ts patterns | `sveltekit-remote-functions` |
+| Svelte framework fundamentals | `svelte` |
+| Hono API routes, middleware, deployment | `hono` |
+| Drizzle ORM schema, queries, migrations | `drizzle` |
+| Neon Postgres connection, branching, serverless driver | `neon-postgres` |
+| Node.js backend architecture, patterns | `nodejs-backend-patterns` + `nodejs-best-practices` |
+| Monorepo workspace management, build optimization | `monorepo-management` |
 | Styling with Tailwind or responsive layouts | `tailwind-css-patterns` |
-| shadcn/ui components or presets | `shadcn` |
 | Tailwind v4 setup or theme issues | `tailwind-v4-shadcn` |
-| Adding or configuring authentication | `clerk` |
-| Writing Playwright or E2E tests | `playwright-best-practices` |
-| Writing Vitest or unit tests | `vitest` |
-| Form validation with React Hook Form | `react-hook-form` |
-| Schema validation with Zod | `zod` |
+| shadcn-svelte components or presets | `shadcn` + `shadcn-svelte` |
 | Complex TypeScript type logic | `typescript-advanced-types` |
-| React performance optimization | `vercel-react-best-practices` |
-| Component architecture or refactoring | `vercel-composition-patterns` |
-| Node.js backend or REST API | `nodejs-backend-patterns` |
+| Vite config or plugin issues | `vite` |
 | Accessibility audit or WCAG compliance | `accessibility` |
 | SEO optimization | `seo` |
-| 2+ independent tasks that can run in parallel | `dispatching-parallel-agents` |
-| Vite config or plugin issues | `vite` |
 | Deploying to Vercel | `deploy-to-vercel` |
+| User says "caveman mode", "be brief", "less tokens" | `caveman` |
+| Writing commit messages tersely | `caveman` (use `/caveman-commit` pattern — conventional commit, ≤50 char subject) |
 
 ## combined workflow
 
@@ -331,12 +335,16 @@ These rules chain graphify + superpowers into a single unified workflow. Follow 
 ### Auto-chain examples
 When the user says:
 - `"fix the auth bug"` → `graphify query "auth"` → `systematic-debugging` → fix → `graphify update .`
-- `"add dark mode toggle"` → `graphify query "theme"` → `brainstorming` → `writing-plans` → implement → `graphify update .`
+- `"add dark mode toggle"` → `graphify query "theme"` → `brainstorming` → `writing-plans` → `svelte-code-writer` + `frontend-design` → implement → `graphify update .`
 - `"how does X relate to Y"` → `graphify path "X" "Y"` → explain from graph
 - `"review my code"` → `requesting-code-review` → cross-reference graph for missed connections
-- `"build a settings page"` → `graphify query "settings"` → `brainstorming` → `frontend-design` → implement → `graphify update .`
+- `"build a settings page"` → `graphify query "settings"` → `brainstorming` → `svelte-code-writer` + `svelte5-best-practices` → implement → `graphify update .`
+- `"add a new database table"` → `graphify query "schema"` → `drizzle` + `neon-postgres` → implement → `graphify update .`
+- `"create a new API route"` → `graphify query "backend"` → `hono` → implement → `graphify update .`
 - `"make it accessible"` → `graphify query` affected area → `accessibility` → fix → `graphify update .`
-- `"optimize performance"` → `graphify query` bottlenecks → `vercel-react-best-practices` → optimize → `graphify update .`
+- `"optimize the monorepo build"` → `graphify query "build"` → `monorepo-management` → fix → `graphify update .`
+- `"caveman mode"` → `caveman` → terse responses, ~75% fewer tokens, all technical substance preserved
+- `"commit this"` → `caveman` → `/caveman-commit` pattern → conventional commit, ≤50 char subject
 
 ## fallback
 
