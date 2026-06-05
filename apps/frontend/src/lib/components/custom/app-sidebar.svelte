@@ -3,12 +3,14 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import SearchDialog from './search-dialog.svelte';
+	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import Bot from '@lucide/svelte/icons/bot';
 	import Search from '@lucide/svelte/icons/search';
 	import PlusCircle from '@lucide/svelte/icons/plus-circle';
 	import MessageSquare from '@lucide/svelte/icons/message-square';
 	import Settings2 from '@lucide/svelte/icons/settings-2';
 
+	const sidebar = useSidebar();
 	let searchOpen = $state(false);
 </script>
 
@@ -23,7 +25,10 @@
 	<Sidebar.Content class="px-4">
 		<button
 			class="mb-3 flex h-10 w-full items-center gap-3 rounded-md border border-hairline bg-surface-input px-3 text-sm text-placeholder-text"
-			onclick={() => (searchOpen = true)}
+			onclick={() => {
+			sidebar.setOpenMobile(false);
+			searchOpen = true;
+		}}
 		>
 			<Search class="size-4 text-icon-default" />
 			Search chats...
