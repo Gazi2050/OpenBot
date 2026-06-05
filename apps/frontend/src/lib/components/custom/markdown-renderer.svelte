@@ -4,7 +4,7 @@
 	let {
 		markdown = '',
 		streaming = false,
-		class: className = '',
+		class: className = ''
 	}: {
 		markdown?: string;
 		streaming?: boolean;
@@ -12,4 +12,4 @@
 	} = $props();
 </script>
 
-<Comark {markdown} {streaming} caret {class} />
+<Comark {markdown} {streaming} caret class={className} />
