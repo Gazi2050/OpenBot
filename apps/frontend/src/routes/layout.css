@@ -1,7 +1,7 @@
 @import 'tailwindcss';
-@import "tw-animate-css";
-@import "shadcn-svelte/tailwind.css";
-@import "@fontsource-variable/inter";
+@import 'tw-animate-css';
+@import 'shadcn-svelte/tailwind.css';
+@import '@fontsource-variable/inter';
 
 @custom-variant dark (&:is(.dark *));
 
@@ -43,7 +43,7 @@
 	--spacing-xxxl: 32px;
 	--spacing-section: 48px;
 
-	--font-primary: "Geist", "Inter Tight", "Inter Variable", system-ui, sans-serif;
+	--font-primary: 'Geist', 'Inter Tight', 'Inter Variable', system-ui, sans-serif;
 	--type-welcome-headline: 700 36px/1.2 var(--font-primary);
 	--type-welcome-subtitle: 400 22px/1.3 var(--font-primary);
 	--type-card-title: 600 15px/1.4 var(--font-primary);

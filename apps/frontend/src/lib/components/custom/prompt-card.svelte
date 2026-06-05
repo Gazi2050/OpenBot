@@ -5,19 +5,13 @@
 </script>
 
 <Card.Root
-	class="cursor-pointer rounded-xl border border-hairline bg-surface-card p-6 min-h-[90px] transition-colors hover:border-hairline-strong hover:bg-surface-elevated"
+	class="min-h-[90px] cursor-pointer rounded-xl border border-hairline bg-surface-card p-6 transition-colors hover:border-hairline-strong hover:bg-surface-elevated"
 >
 	<Card.Content class="p-0">
-		<h3
-			class="text-ink"
-			style="font: var(--type-card-title)"
-		>
+		<h3 class="text-ink" style="font: var(--type-card-title)">
 			{title}
 		</h3>
-		<p
-			class="mt-1"
-			style="font: var(--type-card-body); color: var(--colors-mute)"
-		>
+		<p class="mt-1" style="font: var(--type-card-body); color: var(--colors-mute)">
 			{subtitle}
 		</p>
 	</Card.Content>

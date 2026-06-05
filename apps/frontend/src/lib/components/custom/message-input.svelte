@@ -7,7 +7,9 @@
 	let hasText = $derived(message.length > 0);
 </script>
 
-<div class="flex min-h-[80px] flex-col justify-between rounded-xl border border-hairline-strong bg-surface-input p-3.5">
+<div
+	class="flex min-h-[80px] flex-col justify-between rounded-xl border border-hairline-strong bg-surface-input p-3.5"
+>
 	<textarea
 		bind:value={message}
 		placeholder="Send a message... (@ to mention, / for commands)"
@@ -26,7 +28,9 @@
 		<Button
 			variant="ghost"
 			size="icon"
-			class="size-8 rounded-full {hasText ? 'bg-ink text-canvas hover:bg-ink/90' : 'bg-surface-elevated text-icon-default hover:text-ink'}"
+			class="size-8 rounded-full {hasText
+				? 'bg-ink text-canvas hover:bg-ink/90'
+				: 'bg-surface-elevated text-icon-default hover:text-ink'}"
 			aria-label="Send message"
 		>
 			<ArrowUp class="size-4" />
