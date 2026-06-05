@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Button } from '$lib/components/ui/button/index.js';
-	import Plus from '@lucide/svelte/icons/plus';
+	import ModelSelector from './model-selector.svelte';
 	import ArrowUp from '@lucide/svelte/icons/arrow-up';
 
 	let message = $state('');
@@ -8,7 +8,7 @@
 </script>
 
 <div
-	class="flex min-h-[80px] flex-col justify-between rounded-xl border border-hairline-strong bg-surface-input p-3.5"
+	class="flex min-h-[80px] flex-col justify-between rounded-lg border border-hairline-strong bg-surface-input p-3.5"
 >
 	<textarea
 		bind:value={message}
@@ -19,12 +19,9 @@
 	></textarea>
 
 	<div class="flex items-center justify-between">
-		<button
-			class="flex size-[32px] items-center justify-center rounded-full text-icon-default hover:bg-surface-elevated"
-			aria-label="Attach file"
-		>
-			<Plus class="size-[18px]" />
-		</button>
+		<div class="flex items-center gap-2">
+			<ModelSelector />
+		</div>
 		<Button
 			variant="ghost"
 			size="icon"

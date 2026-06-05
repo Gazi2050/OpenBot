@@ -5,7 +5,7 @@
 </script>
 
 <Card.Root
-	class="min-h-[90px] cursor-pointer rounded-xl border border-hairline bg-surface-card p-6 transition-colors hover:border-hairline-strong hover:bg-surface-elevated"
+	class="min-h-[90px] cursor-pointer rounded-lg border border-hairline bg-surface-card p-6 transition-colors hover:border-hairline-strong hover:bg-surface-elevated"
 >
 	<Card.Content class="p-0">
 		<h3 class="text-ink" style="font: var(--type-card-title)">

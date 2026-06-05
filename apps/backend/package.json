@@ -6,16 +6,23 @@
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
   },
   "dependencies": {
     "@hono/node-server": "^1.19.14",
-    "@openbot/database": "workspace:*",
+    "@neondatabase/serverless": "^1.1.0",
     "@openbot/shared": "workspace:*",
+    "dotenv": "^17.4.2",
+    "drizzle-orm": "^0.44.7",
     "hono": "^4.12.23"
   },
   "devDependencies": {
     "@types/node": "^22",
+    "drizzle-kit": "^0.31.10",
     "tsx": "^4.7.1",
     "typescript": "^5.8.3"
   }

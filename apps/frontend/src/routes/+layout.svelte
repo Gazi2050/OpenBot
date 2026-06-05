@@ -20,9 +20,9 @@
 </svelte:head>
 
 <Tooltip.Provider>
-	<Sidebar.Provider style="--sidebar-width: 275px;">
+	<Sidebar.Provider style="--sidebar-width: 275px;" class="h-svh overflow-hidden">
 		<AppSidebar />
-		<main class="flex h-screen flex-col">
+		<main class="flex min-w-0 flex-1 flex-col">
 			<TopBar />
 			{@render children()}
 		</main>
