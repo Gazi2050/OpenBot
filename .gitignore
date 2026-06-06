@@ -42,3 +42,4 @@ vite.config.ts.timestamp-*
 
 graphify-out
 .opencode
+.commandcode

@@ -2,16 +2,34 @@
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
+	import * as Popover from '$lib/components/ui/popover/index.js';
 	import SearchDialog from './search-dialog.svelte';
+	import ProfilePopover from './profile-popover.svelte';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import Bot from '@lucide/svelte/icons/bot';
 	import Search from '@lucide/svelte/icons/search';
 	import PlusCircle from '@lucide/svelte/icons/plus-circle';
 	import MessageSquare from '@lucide/svelte/icons/message-square';
-	import Settings2 from '@lucide/svelte/icons/settings-2';
 
 	const sidebar = useSidebar();
 	let searchOpen = $state(false);
+
+	const chatHistory = $state([
+		{ id: '1', title: 'React hooks explanation' },
+		{ id: '2', title: 'Weather in San Francisco' },
+		{ id: '3', title: 'Debug Node.js authentication' },
+		{ id: '4', title: 'Plan trip to Tokyo' },
+	]);
+
+	const user = $state({
+		name: 'John Doe',
+		email: 'john@example.com',
+		avatar: 'https://github.com/shadcn.png',
+	});
+
+	function handleSettingsClick() {
+		// placeholder — wire when /settings route exists
+	}
 </script>
 
 <Sidebar.Root collapsible="offcanvas" side="left" variant="sidebar">
@@ -43,43 +61,42 @@
 			New Chat
 		</Button>
 
-		<Sidebar.Group>
-			<Sidebar.GroupContent>
-				<Sidebar.Menu>
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton
-							class="h-10 rounded-md px-4 text-mute-text hover:bg-surface-card hover:text-ink"
-						>
-							{#snippet child({ props })}
-								<a href="#" {...props}>
-									<MessageSquare class="size-[18px] text-icon-default" />
-									<span style="font: var(--type-nav-label)">Chats</span>
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-					</Sidebar.MenuItem>
-					<Sidebar.MenuItem>
-						<Sidebar.MenuButton
-							class="h-10 rounded-md px-4 text-mute-text hover:bg-surface-card hover:text-ink"
-						>
-							{#snippet child({ props })}
-								<a href="#" {...props}>
-									<Settings2 class="size-[18px] text-icon-default" />
-									<span style="font: var(--type-nav-label)">Settings</span>
-								</a>
-							{/snippet}
-						</Sidebar.MenuButton>
-					</Sidebar.MenuItem>
-				</Sidebar.Menu>
-			</Sidebar.GroupContent>
-		</Sidebar.Group>
+		<div class="mt-2 flex flex-1 flex-col gap-0.5 overflow-y-auto min-h-0">
+			{#each chatHistory as chat (chat.id)}
+				<button
+					class="flex h-10 w-full items-center gap-3 rounded-md px-4 text-mute-text hover:bg-surface-card hover:text-ink transition-colors"
+				>
+					<MessageSquare class="size-[18px] text-icon-default" />
+					<span style="font: var(--type-nav-label)" class="truncate">{chat.title}</span>
+				</button>
+			{/each}
+		</div>
 	</Sidebar.Content>
 
 	<Sidebar.Footer class="flex items-start p-4">
-		<Avatar.Root class="size-8 rounded-full border border-hairline-strong">
-			<Avatar.Image src="https://github.com/shadcn.png" alt="User" />
-			<Avatar.Fallback>U</Avatar.Fallback>
-		</Avatar.Root>
+		<Popover.Popover>
+			<Popover.PopoverTrigger
+				class="cursor-pointer rounded-full outline-none hover:ring-2 hover:ring-hairline-strong focus-visible:ring-2 focus-visible:ring-accent-blue transition-all"
+			>
+				<Avatar.Root class="size-8 rounded-full border border-hairline-strong">
+					<Avatar.Image src={user.avatar} alt={user.name} />
+					<Avatar.Fallback>U</Avatar.Fallback>
+				</Avatar.Root>
+			</Popover.PopoverTrigger>
+			<Popover.PopoverContent
+				side="right"
+				align="end"
+				sideOffset={8}
+				class="w-auto rounded-lg border border-hairline p-0 shadow-none"
+			>
+				<ProfilePopover
+					userName={user.name}
+					userEmail={user.email}
+					userAvatar={user.avatar}
+					onSettingsClick={handleSettingsClick}
+				/>
+			</Popover.PopoverContent>
+		</Popover.Popover>
 	</Sidebar.Footer>
 </Sidebar.Root>
 
