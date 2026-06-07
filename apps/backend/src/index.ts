@@ -1,5 +1,7 @@
+import 'dotenv/config'
 import { Hono } from 'hono'
 import { handle } from 'hono/vercel'
+import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import type { ApiResponse } from '@openbot/shared'
 import { logger } from '@openbot/shared'
 
@@ -8,6 +10,8 @@ export const config = {
 }
 
 const app = new Hono().basePath('/api')
+
+app.use('*', clerkMiddleware())
 
 app.get('/', (c) => {
   return c.json<ApiResponse<{ message: string }>>({
@@ -18,6 +22,12 @@ app.get('/', (c) => {
 
 app.get('/health', (c) => {
   return c.json({ status: 'ok' })
+})
+
+app.get('/me', (c) => {
+  const { userId } = getAuth(c)
+  if (!userId) return c.json({ error: 'Unauthorized' }, 401)
+  return c.json({ userId })
 })
 
 export default handle(app)

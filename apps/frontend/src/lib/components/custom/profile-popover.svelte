@@ -2,7 +2,11 @@
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
 	import { Separator } from '$lib/components/ui/separator/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { useClerkContext } from 'svelte-clerk/client';
+	import { goto } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import Settings2 from '@lucide/svelte/icons/settings-2';
+	import LogOut from '@lucide/svelte/icons/log-out';
 
 	let {
 		userName,
@@ -15,6 +19,13 @@
 		userAvatar: string;
 		onSettingsClick?: () => void;
 	} = $props();
+
+	const ctx = useClerkContext();
+
+	async function handleSignOut() {
+		await ctx.clerk?.signOut();
+		goto(resolve('/(auth)/sign-in'));
+	}
 </script>
 
 <div class="flex min-w-[240px] flex-col p-4">
@@ -38,5 +49,14 @@
 	>
 		<Settings2 class="size-[18px] text-icon-default" />
 		<span style="font: var(--type-nav-label)">Settings</span>
+	</Button>
+
+	<Button
+		variant="ghost"
+		class="h-10 w-full justify-start gap-3 rounded-md px-4 text-mute-text hover:bg-surface-card hover:text-ink"
+		onclick={handleSignOut}
+	>
+		<LogOut class="size-[18px] text-icon-default" />
+		<span style="font: var(--type-nav-label)">Sign Out</span>
 	</Button>
 </div>
