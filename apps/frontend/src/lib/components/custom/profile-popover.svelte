@@ -5,19 +5,17 @@
 	import { useClerkContext } from 'svelte-clerk/client';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import Settings2 from '@lucide/svelte/icons/settings-2';
+	import UserRound from '@lucide/svelte/icons/user-round';
 	import LogOut from '@lucide/svelte/icons/log-out';
 
 	let {
 		userName,
 		userEmail,
-		userAvatar,
-		onSettingsClick
+		userAvatar
 	}: {
 		userName: string;
 		userEmail: string;
 		userAvatar: string;
-		onSettingsClick?: () => void;
 	} = $props();
 
 	const ctx = useClerkContext();
@@ -45,10 +43,10 @@
 	<Button
 		variant="ghost"
 		class="h-10 w-full justify-start gap-3 rounded-md px-4 text-mute-text hover:bg-surface-card hover:text-ink"
-		onclick={onSettingsClick}
+		onclick={() => {}}
 	>
-		<Settings2 class="size-[18px] text-icon-default" />
-		<span style="font: var(--type-nav-label)">Settings</span>
+		<UserRound class="size-[18px] text-icon-default" />
+		<span style="font: var(--type-nav-label)">Profile</span>
 	</Button>
 
 	<Button

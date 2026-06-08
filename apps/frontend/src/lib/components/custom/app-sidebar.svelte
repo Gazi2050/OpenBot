@@ -29,10 +29,6 @@
 	const userName = $derived(ctx.user?.fullName ?? ctx.user?.username ?? 'User');
 	const userEmail = $derived(ctx.user?.emailAddresses?.[0]?.emailAddress ?? '');
 	const userAvatar = $derived(ctx.user?.imageUrl ?? '');
-
-	function handleSettingsClick() {
-		// placeholder — wire when /settings route exists
-	}
 </script>
 
 <Sidebar.Root collapsible="offcanvas" side="left" variant="sidebar">
@@ -107,7 +103,6 @@
 						{userName}
 						{userEmail}
 						{userAvatar}
-						onSettingsClick={handleSettingsClick}
 					/>
 				</Popover.PopoverContent>
 			</Popover.Popover>
