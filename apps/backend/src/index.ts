@@ -4,6 +4,7 @@ import { handle } from 'hono/vercel'
 import { clerkMiddleware, getAuth } from '@hono/clerk-auth'
 import type { ApiResponse } from '@openbot/shared'
 import { logger } from '@openbot/shared'
+import aiRoutes from './routes/ai.js'
 
 export const config = {
   runtime: 'edge',
@@ -29,6 +30,8 @@ app.get('/me', (c) => {
   if (!userId) return c.json({ error: 'Unauthorized' }, 401)
   return c.json({ userId })
 })
+
+app.route('/ai', aiRoutes)
 
 export default handle(app)
 
