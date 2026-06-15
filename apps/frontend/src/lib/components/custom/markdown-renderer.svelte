@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Comark } from '@comark/svelte';
+	import mermaid, { Mermaid } from '@comark/svelte/plugins/mermaid';
 
 	let {
 		markdown = '',
@@ -12,4 +13,4 @@
 	} = $props();
 </script>
 
-<Comark {markdown} {streaming} caret class={className} />
+<Comark {markdown} {streaming} caret class={className} components={{ mermaid: Mermaid }} plugins={[mermaid()]} />

@@ -3,22 +3,23 @@ import { DefaultChatTransport } from 'ai'
 
 let model = $state('gemma-4-31b')
 
-export function createChat() {
-	const chat = new Chat({
-		transport: new DefaultChatTransport({
-			api: '/api/ai/chat',
-			get body() {
-				return { model }
-			},
-		}),
-	})
-	return {
-		chat,
-		get model() {
-			return model
+const _chat = new Chat({
+	transport: new DefaultChatTransport({
+		api: '/api/ai/chat',
+		get body() {
+			return { model }
 		},
-		setModel: (m: string) => {
-			model = m
-		},
-	}
+	}),
+})
+
+export const chatState = {
+	get chat() {
+		return _chat
+	},
+	get model() {
+		return model
+	},
+	setModel: (m: string) => {
+		model = m
+	},
 }

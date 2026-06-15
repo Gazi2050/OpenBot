@@ -64,7 +64,10 @@ importers:
     dependencies:
       '@comark/svelte':
         specifier: ^0.3.1
-        version: 0.3.1(svelte@5.55.9(@typescript-eslint/types@8.60.0))
+        version: 0.3.1(beautiful-mermaid@1.1.3)(svelte@5.55.9(@typescript-eslint/types@8.60.0))
+      beautiful-mermaid:
+        specifier: ^1.1.3
+        version: 1.1.3
       svelte-clerk:
         specifier: ^1.1.9
         version: 1.1.9(@sveltejs/kit@2.61.1(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.9(@typescript-eslint/types@8.60.0))(vite@8.0.14(@types/node@22.19.19)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.3)))(svelte@5.55.9(@typescript-eslint/types@8.60.0))(typescript@6.0.3)(vite@8.0.14(@types/node@22.19.19)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.3)))(react@19.2.7)(svelte@5.55.9(@typescript-eslint/types@8.60.0))
@@ -1516,6 +1519,9 @@ packages:
     resolution: {integrity: sha512-BLrgEcRTwX2o6gGxGOCNyMvGSp35YofuYzw9h1IMTRmKqttAZZVU67bdb9Pr2vUHA8+j3i2tJfjO6C6+4myGTA==}
     engines: {node: 18 || 20 || >=22}
 
+  beautiful-mermaid@1.1.3:
+    resolution: {integrity: sha512-TItrtrAyHp1vwFfFVYauWGrquouk/6SS21Aq3RsxindSYZODcN4xYrPZD6BiZRU+o5mKJzDPz9MUSMvELdylyg==}
+
   bits-ui@2.18.1:
     resolution: {integrity: sha512-KkemzKFH4T3gt3H+P86JcnAWExjByv/6vlwjm/BoCwTPHu03yiCdxbghdJLvFReQTe0acCAiRcKfmixxD6XvlA==}
     engines: {node: '>=20'}
@@ -1735,6 +1741,9 @@ packages:
         optional: true
       sqlite3:
         optional: true
+
+  elkjs@0.11.1:
+    resolution: {integrity: sha512-zxxR9k+rx5ktMwT/FwyLdPCrq7xN6e4VGGHH8hA01vVYKjTFik7nHOxBnAYtrgYUB1RpAiLvA1/U2YraWxyKKg==}
 
   enhanced-resolve@5.22.0:
     resolution: {integrity: sha512-xYcDWrpELkFzz9SpZ3PlI6Eu6eD93Yf0WLDRxikGhWJ3MAir2SNZTIVCVZqZ/NUyx8AdMc2gT9C0gPiw18kG+A==}
@@ -2748,10 +2757,12 @@ snapshots:
       - react
       - react-dom
 
-  '@comark/svelte@0.3.1(svelte@5.55.9(@typescript-eslint/types@8.60.0))':
+  '@comark/svelte@0.3.1(beautiful-mermaid@1.1.3)(svelte@5.55.9(@typescript-eslint/types@8.60.0))':
     dependencies:
-      comark: 0.3.2
+      comark: 0.3.2(beautiful-mermaid@1.1.3)
       svelte: 5.55.9(@typescript-eslint/types@8.60.0)
+    optionalDependencies:
+      beautiful-mermaid: 1.1.3
 
   '@drizzle-team/brocli@0.10.2': {}
 
@@ -3596,6 +3607,11 @@ snapshots:
 
   balanced-match@4.0.4: {}
 
+  beautiful-mermaid@1.1.3:
+    dependencies:
+      elkjs: 0.11.1
+      entities: 7.0.1
+
   bits-ui@2.18.1(@internationalized/date@3.12.2)(@sveltejs/kit@2.61.1(@opentelemetry/api@1.9.1)(@sveltejs/vite-plugin-svelte@7.1.2(svelte@5.55.9(@typescript-eslint/types@8.60.0))(vite@8.0.14(@types/node@22.19.19)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.3)))(svelte@5.55.9(@typescript-eslint/types@8.60.0))(typescript@6.0.3)(vite@8.0.14(@types/node@22.19.19)(esbuild@0.28.0)(jiti@2.7.0)(tsx@4.22.3)))(svelte@5.55.9(@typescript-eslint/types@8.60.0)):
     dependencies:
       '@floating-ui/core': 1.7.5
@@ -3628,12 +3644,14 @@ snapshots:
 
   clsx@2.1.1: {}
 
-  comark@0.3.2:
+  comark@0.3.2(beautiful-mermaid@1.1.3):
     dependencies:
       entities: 8.0.0
       htmlparser2: 12.0.0
       js-yaml: 4.1.1
       markdown-exit: 1.0.0-beta.9
+    optionalDependencies:
+      beautiful-mermaid: 1.1.3
 
   commander@14.0.3: {}
 
@@ -3701,6 +3719,8 @@ snapshots:
       '@neondatabase/serverless': 1.1.0
       '@opentelemetry/api': 1.9.1
       postgres: 3.4.9
+
+  elkjs@0.11.1: {}
 
   enhanced-resolve@5.22.0:
     dependencies:
