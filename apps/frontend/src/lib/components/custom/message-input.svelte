@@ -12,7 +12,7 @@
 >
 	<textarea
 		bind:value={message}
-		placeholder="Send a message... (@ to mention, / for commands)"
+		placeholder="Ask anything — code, explain, brainstorm..."
 		class="flex-1 resize-none bg-transparent text-sm text-ink outline-none placeholder:text-placeholder-text"
 		style="font: var(--type-input-text)"
 		rows="2"
