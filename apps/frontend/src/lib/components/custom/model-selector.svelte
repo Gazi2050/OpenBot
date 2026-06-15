@@ -3,13 +3,11 @@
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
 
 	const models = [
-		{ id: 'gemma-4-31b', label: 'Gemma 4 31B' },
-		{ id: 'gemini-3.5-flash', label: 'Gemini 3.5 Flash' },
+		{ id: 'gemma-4-31b', label: 'Gemma 4' },
 		{ id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash Lite' },
-		{ id: 'gemini-2.5-pro', label: 'Gemini 2.5 Pro' },
-		{ id: 'llama-3.1-8b-instant', label: 'Llama 3.1 8B Instant' },
-		{ id: 'meta-llama/llama-prompt-guard-2-22m', label: 'Prompt Guard 2 22M' },
-		{ id: 'meta-llama/llama-prompt-guard-2-86m', label: 'Prompt Guard 2 86M' },
+		{ id: 'llama-3.1-8b-instant', label: 'Llama 3.1' },
+		{ id: 'gpt-oss:20b-cloud', label: 'GPT-OSS' },
+		{ id: 'deepseek-v4-flash:cloud', label: 'DeepSeek V4 Flash' },
 	] as const;
 
 	let {

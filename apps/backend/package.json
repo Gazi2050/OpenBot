@@ -23,6 +23,7 @@
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.44.7",
     "hono": "^4.12.23",
+    "ollama-ai-provider-v2": "^3.6.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
