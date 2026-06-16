@@ -15,3 +15,19 @@ export interface Bot {
 }
 
 export type BotStatus = 'online' | 'offline' | 'maintenance'
+
+export interface Conversation {
+	id: string
+	userId: string
+	title: string
+	createdAt: Date
+	updatedAt: Date
+}
+
+export interface Message {
+	id: string
+	conversationId: string
+	role: 'user' | 'assistant'
+	content: string
+	createdAt: Date
+}

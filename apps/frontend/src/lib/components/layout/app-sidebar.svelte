@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { onMount } from 'svelte';
+	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import * as Sidebar from '$lib/components/ui/sidebar/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
 	import * as Avatar from '$lib/components/ui/avatar/index.js';
@@ -7,21 +10,17 @@
 	import ProfilePopover from './profile-popover.svelte';
 	import { useSidebar } from '$lib/components/ui/sidebar/context.svelte.js';
 	import { useClerkContext } from 'svelte-clerk/client';
+	import { chatState } from '$lib/hooks/chat.svelte.js';
+	import { conversationsState } from '$lib/hooks/conversations.svelte.js';
 	import Bot from '@lucide/svelte/icons/bot';
 	import Search from '@lucide/svelte/icons/search';
 	import PlusCircle from '@lucide/svelte/icons/plus-circle';
 	import MessageSquare from '@lucide/svelte/icons/message-square';
 	import LogIn from '@lucide/svelte/icons/log-in';
+	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	const sidebar = useSidebar();
 	let searchOpen = $state(false);
-
-	const chatHistory = $state([
-		{ id: '1', title: 'React hooks explanation' },
-		{ id: '2', title: 'Weather in San Francisco' },
-		{ id: '3', title: 'Debug Node.js authentication' },
-		{ id: '4', title: 'Plan trip to Tokyo' }
-	]);
 
 	const ctx = useClerkContext();
 	const isLoaded = $derived(ctx.auth.userId !== undefined);
@@ -29,6 +28,28 @@
 	const userName = $derived(ctx.user?.fullName ?? ctx.user?.username ?? 'User');
 	const userEmail = $derived(ctx.user?.emailAddresses?.[0]?.emailAddress ?? '');
 	const userAvatar = $derived(ctx.user?.imageUrl ?? '');
+
+	let currentChatId = $derived($page.params.id ?? conversationsState.currentId);
+
+	function handleNewChat() {
+		sidebar.setOpenMobile(false);
+		chatState.newConversation();
+		goto('/');
+	}
+
+	function handleSelectChat(id: string) {
+		sidebar.setOpenMobile(false);
+		goto('/c/' + id);
+	}
+
+	async function handleDeleteChat(id: string, e: MouseEvent | KeyboardEvent) {
+		e.stopPropagation();
+		await conversationsState.remove(id);
+	}
+
+	onMount(() => {
+		conversationsState.fetch();
+	});
 </script>
 
 <Sidebar.Root collapsible="offcanvas" side="left" variant="sidebar">
@@ -55,20 +76,39 @@
 			variant="ghost"
 			class="mb-3 h-11 w-full justify-start gap-2 rounded-lg bg-accent-lime px-4 text-sm font-semibold text-accent-lime-on hover:brightness-[0.92]"
 			style="background-color: #a8f251; color: #0e1a00; border-radius: 12px"
+			onclick={handleNewChat}
 		>
 			<PlusCircle class="size-[18px]" />
 			New Chat
 		</Button>
 
 		<div class="mt-2 flex min-h-0 flex-1 flex-col gap-0.5 overflow-y-auto">
-			{#each chatHistory as chat (chat.id)}
+			{#each conversationsState.conversations as conv (conv.id)}
 				<button
-					class="flex h-10 w-full items-center gap-3 rounded-md px-4 text-mute-text transition-colors hover:bg-surface-card hover:text-ink"
+					onclick={() => handleSelectChat(conv.id)}
+					class="group flex h-10 w-full items-center gap-3 rounded-md px-4 text-mute-text transition-colors hover:bg-surface-card hover:text-ink"
+					class:bg-surface-card={currentChatId === conv.id}
+					class:text-ink={currentChatId === conv.id}
 				>
 					<MessageSquare class="size-[18px] text-icon-default" />
-					<span style="font: var(--type-nav-label)" class="truncate">{chat.title}</span>
+					<span style="font: var(--type-nav-label)" class="truncate">{conv.title}</span>
+					<span
+						onclick={(e: MouseEvent) => handleDeleteChat(conv.id, e)}
+						onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') handleDeleteChat(conv.id, e) }}
+						role="button"
+						tabindex="0"
+						class="ml-auto hidden rounded p-0.5 text-icon-default opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
+						aria-label="Delete chat"
+					>
+						<Trash2 class="size-3.5" />
+					</span>
 				</button>
 			{/each}
+			{#if conversationsState.conversations.length === 0 && !conversationsState.loading}
+				<div class="px-4 py-6 text-center text-xs" style="color: var(--colors-mute)">
+					No conversations yet
+				</div>
+			{/if}
 		</div>
 	</Sidebar.Content>
 

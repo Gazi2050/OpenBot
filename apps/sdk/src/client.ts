@@ -1,7 +1,7 @@
-import type { ApiResponse, Bot, BotStatus } from '@openbot/shared'
+import type { ApiResponse, Bot, Conversation, Message } from '@openbot/shared'
 import { API_PATHS } from './config/constants.js'
 
-export type { ApiResponse, Bot, BotStatus }
+export type { ApiResponse, Bot, Conversation, Message }
 
 export class OpenBotClient {
 	private baseUrl: string
@@ -15,11 +15,41 @@ export class OpenBotClient {
 		return res.json()
 	}
 
+	private async requestWithBody<T>(path: string, body: object, method = 'POST'): Promise<ApiResponse<T>> {
+		const res = await fetch(`${this.baseUrl}${path}`, {
+			method,
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify(body),
+		})
+		return res.json()
+	}
+
 	async health() {
 		return this.request<{ status: string }>(API_PATHS.HEALTH)
 	}
 
 	async getBots() {
 		return this.request<Bot[]>('/bots')
+	}
+
+	async getConversations() {
+		return this.request<Conversation[]>(API_PATHS.CONVERSATIONS)
+	}
+
+	async getConversation(id: string) {
+		return this.request<{ conversation: Conversation; messages: Message[] }>(
+			`${API_PATHS.CONVERSATIONS}/${id}`
+		)
+	}
+
+	async createConversation(title?: string) {
+		return this.requestWithBody<Conversation>(API_PATHS.CONVERSATIONS, { title })
+	}
+
+	async deleteConversation(id: string) {
+		const res = await fetch(`${this.baseUrl}${API_PATHS.CONVERSATIONS}/${id}`, {
+			method: 'DELETE',
+		})
+		return res.json()
 	}
 }
