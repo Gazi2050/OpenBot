@@ -1,0 +1,5 @@
+export { default as AppSidebar } from './app-sidebar.svelte'
+export { default as TopBar } from './topbar.svelte'
+export { default as SearchDialog } from './search-dialog.svelte'
+export { default as ProfilePopover } from './profile-popover.svelte'
+export { default as OpenBotLogo } from './openbot-logo.svelte'

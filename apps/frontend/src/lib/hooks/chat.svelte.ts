@@ -1,15 +1,11 @@
-import { Chat } from '@ai-sdk/svelte'
-import { DefaultChatTransport } from 'ai'
+import { models } from 'openbot-sdk'
+import { createChat } from 'openbot-sdk/chat'
 
-let model = $state('gemma-4-31b')
+let model = $state(models[0].id)
 
-const _chat = new Chat({
-	transport: new DefaultChatTransport({
-		api: '/api/ai/chat',
-		get body() {
-			return { model }
-		},
-	}),
+const _chat = createChat({
+	api: '/api/ai/chat',
+	getBody: () => ({ model }),
 })
 
 export const chatState = {

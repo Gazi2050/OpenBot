@@ -1,24 +1,22 @@
 <script lang="ts">
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-
-	const models = [
-		{ id: 'gemma-4-31b', label: 'Gemma 4' },
-		{ id: 'llama-3.1-8b-instant', label: 'Llama 3.1' },
-		{ id: 'gpt-oss:20b-cloud', label: 'GPT-OSS' },
-		{ id: 'gemini-3.1-flash-lite', label: 'Gemini 3.1 Flash Lite' },
-		{ id: 'deepseek-v4-flash:cloud', label: 'DeepSeek V4 Flash' },
-	] as const;
+	import { models } from 'openbot-sdk';
 
 	let {
-		model = 'gemma-4-31b',
+		model = models[0].id,
 		onChange
 	}: {
 		model?: string
 		onChange?: (modelId: string) => void
 	} = $props();
 
-	let selected = $state(model);
+	let selected = $state(models[0].id);
+
+	$effect(() => {
+		selected = model;
+	});
+
 	let open = $state(false);
 
 	function selectModel(id: string) {

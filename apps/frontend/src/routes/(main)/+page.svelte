@@ -1,16 +1,10 @@
 <script lang="ts">
-	import PromptCard from '$lib/components/custom/prompt-card.svelte';
-	import MessageInput from '$lib/components/custom/message-input.svelte';
-	import MarkdownRenderer from '$lib/components/custom/markdown-renderer.svelte';
+	import { PromptCard, MessageInput, ChatMessage } from '$lib/components/chat';
+	import { OpenBotLogo } from '$lib/components/layout';
 	import { chatState } from '$lib/hooks/chat.svelte.js';
 
 	let messagesContainer = $state<HTMLDivElement>();
 	let showWelcome = $derived(chatState.chat.messages.length === 0);
-
-	function getMessageText(msg: (typeof chatState.chat.messages)[number]) {
-		const textPart = msg.parts.find((p) => p.type === 'text');
-		return textPart?.type === 'text' ? textPart.text : '';
-	}
 
 	function isStreaming(msgId: string) {
 		const msgs = chatState.chat.messages;
@@ -19,18 +13,15 @@
 	}
 
 	$effect(() => {
-		const msgs = chatState.chat.messages;
-		const lastMsg = msgs[msgs.length - 1];
-		const lastText = lastMsg ? getMessageText(lastMsg) : '';
-		if (messagesContainer && lastText) {
+		if (messagesContainer) {
 			messagesContainer.scrollTop = messagesContainer.scrollHeight;
 		}
 	});
 </script>
 
-<div class="flex flex-1 flex-col">
+<div class="flex min-h-0 flex-1 flex-col">
 	{#if showWelcome}
-		<div class="flex flex-1 flex-col items-center overflow-y-auto px-8">
+		<div class="flex min-h-0 flex-1 flex-col items-center overflow-y-auto px-8">
 			<div class="flex w-full max-w-[680px] flex-1 flex-col justify-center">
 				<div class="flex flex-col items-center">
 					<h1 class="text-center text-ink" style="font: var(--type-welcome-headline)">
@@ -52,33 +43,27 @@
 	{:else}
 		<div
 			bind:this={messagesContainer}
-			class="flex-1 overflow-y-auto px-8 py-6"
+			class="min-h-0 flex-1 overflow-y-auto px-8 py-6"
 		>
 			<div class="mx-auto flex w-full max-w-[680px] flex-col gap-4">
-				{#each chatState.chat.messages as msg, i (msg.id)}
-					{#if msg.role === 'user'}
-						<div class="flex justify-end">
-							<div
-								class="max-w-[80%] rounded-2xl bg-surface-elevated px-4 py-3 text-sm"
-								style="color: var(--colors-ink)"
-							>
-								{getMessageText(msg)}
-							</div>
-						</div>
-					{:else if msg.role === 'assistant'}
-						<div class="text-sm" style="color: var(--colors-ink)">
-							<MarkdownRenderer
-								markdown={getMessageText(msg)}
-								streaming={isStreaming(msg.id)}
-							/>
-						</div>
-					{/if}
+				{#each chatState.chat.messages as msg (msg.id)}
+					<ChatMessage {msg} streaming={isStreaming(msg.id)} />
 				{/each}
 
 				{#if chatState.chat.status === 'submitted'}
-					<div class="flex items-center gap-2 py-2 text-xs" style="color: var(--colors-mute)">
-						<span class="size-2 animate-pulse rounded-full" style="background-color: var(--colors-mute)"></span>
-						Thinking...
+					<div class="flex gap-3">
+						<div
+							class="mt-0.5 flex size-7 shrink-0 items-center justify-center rounded-lg bg-surface-elevated"
+						>
+							<OpenBotLogo class="size-4" />
+						</div>
+						<div
+							class="flex items-center gap-2 rounded-2xl border border-hairline bg-surface-card px-4 py-3 text-xs"
+							style="color: var(--colors-mute)"
+						>
+							<span class="size-2 animate-pulse rounded-full bg-current"></span>
+							Thinking...
+						</div>
 					</div>
 				{:else if chatState.chat.status === 'error'}
 					<div class="text-sm" style="color: var(--color-error, #ef4444)">
@@ -89,7 +74,7 @@
 		</div>
 	{/if}
 
-	<div class="px-8 py-8">
+	<div class="shrink-0 px-8 py-8">
 		<div class="mx-auto max-w-[680px]">
 			<MessageInput />
 		</div>

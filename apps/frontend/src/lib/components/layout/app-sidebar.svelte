@@ -74,7 +74,7 @@
 
 	<Sidebar.Footer class="flex items-start p-4">
 		{#if !isLoaded}
-			<div class="size-8 animate-pulse rounded-full bg-surface-card" />
+			<div class="size-8 animate-pulse rounded-full bg-surface-card"></div>
 		{:else if !isSignedIn}
 			<a
 				href="/sign-in"

@@ -1,2 +1,1 @@
-export { models, DEFAULT_MODEL } from './models.js'
-export { getModel } from './providers.js'
+export { getModel, DEFAULT_MODEL } from './providers.js'
