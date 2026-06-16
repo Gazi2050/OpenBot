@@ -25,8 +25,21 @@
 	title="Copy"
 >
 	{#if copied}
-		<Check class="size-3.5" />
+		<Check class="size-3.5 copy-icon" />
 	{:else}
-		<Copy class="size-3.5" />
+		<Copy class="size-3.5 copy-icon" />
 	{/if}
 </button>
+
+<style>
+	:global(.copy-icon) {
+		transition:
+			transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1),
+			opacity 0.15s ease;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		:global(.copy-icon) {
+			transition: none !important;
+		}
+	}
+</style>

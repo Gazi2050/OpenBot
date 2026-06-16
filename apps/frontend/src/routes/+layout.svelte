@@ -1,4 +1,5 @@
 <script lang="ts">
+	import 'slot-text/style.css';
 	import './layout.css';
 	import favicon from '$lib/assets/favicon.svg';
 	import { ClerkProvider } from 'svelte-clerk';
