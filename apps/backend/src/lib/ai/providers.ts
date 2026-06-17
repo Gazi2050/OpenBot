@@ -27,18 +27,19 @@ for (const m of models) {
 
 const availableIds = Object.keys(providers)
 
-export const DEFAULT_MODEL = availableIds[0] ?? ''
+if (availableIds.length === 0) {
+	throw new Error(
+		'No AI providers loaded. Set at least one of GOOGLE_GENERATIVE_AI_API_KEY, GROQ_API_KEY, or OLLAMA_API_KEY in the repo root .env.'
+	)
+}
+
+export const DEFAULT_MODEL = availableIds[0]
 
 export function getModel(modelId: string): LanguageModel {
-	if (availableIds.length === 0) {
-		throw new Error(
-			'No AI providers loaded. Set at least one of GOOGLE_GENERATIVE_AI_API_KEY, GROQ_API_KEY, or OLLAMA_API_KEY in the repo root .env.'
-		)
-	}
 	const provider = providers[modelId]
 	if (!provider) {
 		console.warn(`Unknown or unavailable model "${modelId}", falling back to ${DEFAULT_MODEL}`)
-		return providers[DEFAULT_MODEL] as LanguageModel
+		return providers[DEFAULT_MODEL]
 	}
 	return provider
 }

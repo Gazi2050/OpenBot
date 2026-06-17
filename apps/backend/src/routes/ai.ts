@@ -4,6 +4,7 @@ import { streamText, convertToModelMessages } from 'ai'
 import { eq } from 'drizzle-orm'
 import { getModel, DEFAULT_MODEL } from '../lib/ai/providers.js'
 import { SYSTEM_PROMPT } from 'openbot-sdk'
+import { logger } from '@openbot/shared'
 import { getDb } from '../db/index.js'
 import { conversations, messages } from '../db/schema/index.js'
 
@@ -51,8 +52,18 @@ app.post('/chat', async (c) => {
 		model: getModel(modelId),
 		messages: await convertToModelMessages(uiMessages),
 		system: SYSTEM_PROMPT,
+		onError: ({ error }) => {
+			logger.error(`[ai] stream error — model="${modelId}" msgCount=${uiMessages?.length ?? 0} conversationId=${conversationId ?? '-'}`)
+			if (error instanceof Error) {
+				logger.error(`${error.name}: ${error.message}`)
+				if (error.stack) logger.error(error.stack)
+			} else {
+				logger.error(String(error))
+			}
+		},
 		onFinish: async ({ text }) => {
-			if (conversationId && text) {
+			if (!conversationId || !text) return
+			try {
 				const assistantMsgId = crypto.randomUUID()
 				await db.insert(messages).values({
 					id: assistantMsgId,
@@ -63,12 +74,16 @@ app.post('/chat', async (c) => {
 				await db.update(conversations)
 					.set({ updatedAt: new Date() })
 					.where(eq(conversations.id, conversationId))
+			} catch (e) {
+				logger.error(`[ai] failed to persist assistant message for conversation ${conversationId}:`)
+				logger.error(e instanceof Error ? e.message : String(e))
 			}
 		},
 	})
 
 	return result.toUIMessageStreamResponse({
 		headers: conversationId ? { 'X-Conversation-Id': conversationId } : undefined,
+		onError: (error) => error instanceof Error ? error.message : String(error),
 	})
 })
 

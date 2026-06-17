@@ -4,7 +4,7 @@
 
 OpenBot is a developer-facing chat interface with the visual language of a precision instrument. It is a pnpm monorepo with 3 apps and 2 shared packages, deployed as a SvelteKit frontend + Hono backend (Vercel edge).
 
-**Current state:** Scaffolded but minimal. Frontend shows default SvelteKit welcome page. Backend has 2 routes (root + health). Database has 1 table (`bots`) not yet wired into routes. No custom UI components implemented yet.
+**Current state:** Active chat product under development. Frontend includes chat UI, sidebar conversation list, per-conversation route hydration (`/c/[id]`), and delete flows. Backend exposes AI streaming and conversation CRUD routes backed by database tables for conversations and messages.
 
 **Architecture:**
 
@@ -54,7 +54,9 @@ OpenBot/
 │   │   └── components.json   # shadcn-svelte config (luma style, lucide icons)
 │   │
 │   ├── backend/              # @openbot/backend — Hono 4 API server
-│   │   └── src/index.ts      # Routes: GET /api/, GET /api/health
+│   │   ├── src/index.ts      # Mounts API routes
+│   │   ├── src/routes/ai.ts  # POST /api/ai/chat (streaming, persists messages)
+│   │   └── src/routes/conversations.ts # CRUD for conversations + message history
 │   │
 │   └── sdk/                  # openbot-sdk — Public npm package
 │       └── src/index.ts      # OpenBotClient class (health, getBots)
@@ -246,8 +248,15 @@ The frontend proxies `/api` requests to the Hono backend:
 - **Edge deployment:** Exports `config = { runtime: 'edge' }` and `default handle(app)` for Vercel
 - **Dev server:** In non-production, dynamically imports `@hono/node-server`, listens on `PORT` (default 3000)
 - **Response format:** All endpoints return `ApiResponse<T>` from `@openbot/shared`
-- **Current routes:** `GET /api/` (welcome), `GET /api/health` (health check)
-- **Note:** `@openbot/database` is installed but NOT yet used in any route handler
+- **Current routes:**
+  - `GET /api/` (welcome)
+  - `GET /api/health` (health check)
+  - `POST /api/ai/chat` (AI streaming response, returns `X-Conversation-Id`, persists user/assistant messages)
+  - `GET /api/conversations` (list user conversations)
+  - `POST /api/conversations` (create conversation)
+  - `GET /api/conversations/:id` (conversation + message history)
+  - `DELETE /api/conversations/:id` (delete conversation)
+- **Database usage:** Backend routes actively use `@openbot/database` for conversations/messages persistence.
 
 ### Adding a new route
 
@@ -256,16 +265,36 @@ The frontend proxies `/api` requests to the Hono backend:
 3. Add corresponding method to `OpenBotClient` in `apps/sdk/src/index.ts`
 4. Re-export any new types from `@openbot/shared`
 
+## Frontend Chat State Flow
+
+- **Source files:**
+  - `apps/frontend/src/lib/hooks/chat.svelte.ts`
+  - `apps/frontend/src/lib/hooks/conversations.svelte.ts`
+  - `apps/frontend/src/routes/(main)/c/[id]/+page.server.ts`
+  - `apps/frontend/src/routes/(main)/c/[id]/+page.svelte`
+- **Single source of truth:** active conversation id is `conversationsState.currentId`, persisted in session storage and synchronized from `/c/[id]` route data.
+- **Critical behavior:** `chat.svelte.ts` `getBody()` must provide `conversationId` when `currentId` is present; missing id causes backend to create a new conversation.
+- **Response reconciliation:** `X-Conversation-Id` response header must reconcile client state to keep sidebar, URL, and active chat consistent.
+
+## Known Pitfalls (Important)
+
+- **Do not pass transport body via accessor getter at initialization** in `apps/sdk/src/chat.ts`.
+  - Bad pattern: `get body() { return opts.getBody?.() ?? {} }`
+  - This can freeze an initial body value in transport setup and miss updated `conversationId` on later sends.
+  - Use a dynamic resolvable body function (`body: opts.getBody`) so body is evaluated per request.
+- If `conversationId` is omitted in `/api/ai/chat`, backend intentionally creates a new conversation.
+- Any mismatch between `currentId`, URL, and `X-Conversation-Id` causes sidebar/UI divergence and apparent conversation splitting.
+
 ## Current State & Gaps
 
 | Area | Status |
 |------|--------|
-| Frontend UI | Scaffolded — default SvelteKit welcome page, no custom components |
-| Backend API | 2 routes (root + health), database not wired |
-| Database | 1 table (`bots`), no migrations generated |
-| SDK | Basic client with `health()` and `getBots()` |
+| Frontend UI | Chat UI, sidebar, per-conversation route hydration, and delete flows implemented |
+| Backend API | Health + AI chat + conversations CRUD routes implemented |
+| Database | Conversations/messages tables used by backend routes |
+| SDK | Includes chat transport helper (`apps/sdk/src/chat.ts`) used by frontend |
 | Design tokens | `layout.css` uses shadcn defaults, not DESIGN.md tokens |
-| Tests | None — no test framework configured |
+| Tests | No dedicated automated chat-flow tests yet (manual verification still required) |
 | CI/CD | None — no GitHub Actions or deployment pipeline |
 
 ## graphify

@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { goto } from '$app/navigation';
+	import { page } from '$app/stores';
 	import * as SidebarPrimitive from '$lib/components/ui/sidebar/index.js';
 	import { Button } from '$lib/components/ui/button/index.js';
+	import { chatState } from '$lib/hooks/chat.svelte.js';
 	import { conversationsState } from '$lib/hooks/conversations.svelte.js';
 	import Share from '@lucide/svelte/icons/share';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
@@ -9,7 +11,12 @@
 	async function handleDelete() {
 		const id = conversationsState.currentId;
 		if (!id) return;
+		const isViewingDeletedChat = $page.params.id === id;
 		await conversationsState.remove(id);
+		if (isViewingDeletedChat) {
+			chatState.newConversation();
+			await goto('/');
+		}
 	}
 </script>
 

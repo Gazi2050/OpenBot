@@ -13,9 +13,7 @@ export function createChat(opts: CreateChatOptions): Chat {
 	return new Chat({
 		transport: new DefaultChatTransport({
 			api: opts.api,
-			get body() {
-				return opts.getBody?.() ?? {}
-			},
+			body: opts.getBody,
 			fetch: opts.onResponse
 				? async (url, init) => {
 						const response = await fetch(url, init)

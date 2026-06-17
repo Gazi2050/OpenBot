@@ -12,6 +12,7 @@
 	import { useClerkContext } from 'svelte-clerk/client';
 	import { chatState } from '$lib/hooks/chat.svelte.js';
 	import { conversationsState } from '$lib/hooks/conversations.svelte.js';
+	import type { Conversation } from '@openbot/shared';
 	import Bot from '@lucide/svelte/icons/bot';
 	import Search from '@lucide/svelte/icons/search';
 	import PlusCircle from '@lucide/svelte/icons/plus-circle';
@@ -29,6 +30,14 @@
 	const userEmail = $derived(ctx.user?.emailAddresses?.[0]?.emailAddress ?? '');
 	const userAvatar = $derived(ctx.user?.imageUrl ?? '');
 
+	let layoutConversations = $derived<Conversation[]>(
+		($page.data.conversations as Conversation[] | undefined) ?? []
+	);
+
+	$effect(() => {
+		conversationsState.hydrate(layoutConversations);
+	});
+
 	let currentChatId = $derived($page.params.id ?? conversationsState.currentId);
 
 	function handleNewChat() {
@@ -44,11 +53,24 @@
 
 	async function handleDeleteChat(id: string, e: MouseEvent | KeyboardEvent) {
 		e.stopPropagation();
+		const isViewing = window.location.pathname === `/c/${id}`;
 		await conversationsState.remove(id);
+		if (isViewing) {
+			chatState.newConversation();
+			await goto('/');
+		}
 	}
 
+	$effect(() => {
+		if (isSignedIn && !conversationsState.hydrated) {
+			conversationsState.fetch();
+		}
+	});
+
 	onMount(() => {
-		conversationsState.fetch();
+		if (!conversationsState.hydrated) {
+			conversationsState.fetch();
+		}
 	});
 </script>
 
@@ -94,17 +116,23 @@
 					<span style="font: var(--type-nav-label)" class="truncate">{conv.title}</span>
 					<span
 						onclick={(e: MouseEvent) => handleDeleteChat(conv.id, e)}
-						onkeydown={(e: KeyboardEvent) => { if (e.key === 'Enter' || e.key === ' ') handleDeleteChat(conv.id, e) }}
+						onkeydown={(e: KeyboardEvent) => {
+							if (e.key === 'Enter' || e.key === ' ') handleDeleteChat(conv.id, e);
+						}}
 						role="button"
 						tabindex="0"
-						class="ml-auto hidden rounded p-0.5 text-icon-default opacity-0 transition-opacity hover:text-red-400 group-hover:opacity-100"
+						class="ml-auto hidden rounded p-0.5 text-icon-default opacity-0 transition-opacity group-hover:opacity-100 hover:text-red-400"
 						aria-label="Delete chat"
 					>
 						<Trash2 class="size-3.5" />
 					</span>
 				</button>
 			{/each}
-			{#if conversationsState.conversations.length === 0 && !conversationsState.loading}
+			{#if conversationsState.conversations.length === 0 && !conversationsState.hydrated}
+				{#each [0, 1, 2] as i (i)}
+					<div class="h-10 animate-pulse rounded-md bg-surface-card"></div>
+				{/each}
+			{:else if conversationsState.conversations.length === 0 && !conversationsState.loading}
 				<div class="px-4 py-6 text-center text-xs" style="color: var(--colors-mute)">
 					No conversations yet
 				</div>
@@ -139,11 +167,7 @@
 					sideOffset={8}
 					class="w-auto rounded-lg border border-hairline p-0 shadow-none"
 				>
-					<ProfilePopover
-						{userName}
-						{userEmail}
-						{userAvatar}
-					/>
+					<ProfilePopover {userName} {userEmail} {userAvatar} />
 				</Popover.PopoverContent>
 			</Popover.Popover>
 		{/if}

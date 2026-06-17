@@ -1,10 +1,6 @@
 <script lang="ts">
-	import { browser } from '$app/environment';
-	import { goto } from '$app/navigation';
-	import { page } from '$app/stores';
 	import { MessageInput, ChatMessage } from '$lib/components/chat';
 	import { chatState } from '$lib/hooks/chat.svelte.js';
-	import { conversationsState } from '$lib/hooks/conversations.svelte.js';
 	import { slotText } from 'slot-text/svelte';
 	import { untrack } from 'svelte';
 	import Bot from '@lucide/svelte/icons/bot';
@@ -39,7 +35,6 @@
 	}
 
 	let activityLabel = $derived(getActivityLabel());
-	let promotedId = $state<string | null>(null);
 
 	function onScroll() {
 		if (!messagesContainer) return;
@@ -76,22 +71,6 @@
 			}
 		}, 100);
 		return () => clearInterval(interval);
-	});
-
-	$effect(() => {
-		if (!conversationsState.currentId) promotedId = null;
-	});
-
-	$effect(() => {
-		const cid = conversationsState.currentId;
-		const status = chatState.chat.status;
-		const routeId = $page.params.id;
-		if (!cid || !browser) return;
-		if (status !== 'ready' && status !== 'error') return;
-		if (routeId === cid || promotedId === cid) return;
-		if (window.location.pathname !== '/c/' + cid) return;
-		promotedId = cid;
-		goto('/c/' + cid, { replaceState: true, noScroll: true, keepFocus: true });
 	});
 </script>
 
@@ -145,7 +124,10 @@
 							>
 								<span class="size-2 animate-pulse rounded-full bg-current"></span>
 								<span
-									use:slotText={{ text: activityLabel, options: { direction: 'up', stagger: 35, duration: 280 } }}
+									use:slotText={{
+										text: activityLabel,
+										options: { direction: 'up', stagger: 35, duration: 280 }
+									}}
 								>
 									{activityLabel}
 								</span>
