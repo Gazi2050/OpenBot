@@ -3,6 +3,7 @@ import { groq } from '@ai-sdk/groq'
 import { createOllama } from 'ollama-ai-provider-v2'
 import type { LanguageModel } from 'ai'
 import { models } from 'openbot-sdk'
+import { logger } from '@openbot/shared'
 
 const ollama = createOllama({
 	baseURL: 'https://ollama.com/api',
@@ -34,11 +35,16 @@ if (availableIds.length === 0) {
 }
 
 export const DEFAULT_MODEL = availableIds[0]
+export const availableModelIds = availableIds
+
+export function resolveModelId(modelId: string): string {
+	return providers[modelId] ? modelId : DEFAULT_MODEL
+}
 
 export function getModel(modelId: string): LanguageModel {
 	const provider = providers[modelId]
 	if (!provider) {
-		console.warn(`Unknown or unavailable model "${modelId}", falling back to ${DEFAULT_MODEL}`)
+		logger.warn(`Unknown or unavailable model "${modelId}", falling back to ${DEFAULT_MODEL}`)
 		return providers[DEFAULT_MODEL]
 	}
 	return provider

@@ -77,7 +77,11 @@
 
 	<div class="flex items-center justify-between">
 		<div class="flex items-center gap-2">
-			<ModelSelector model={chatState.model} onChange={(m) => chatState.setModel(m)} />
+			<ModelSelector
+				model={chatState.model}
+				enabledModelIds={chatState.enabledModelIds}
+				onChange={(m) => chatState.setModel(m)}
+			/>
 		</div>
 		<Button
 			variant="ghost"

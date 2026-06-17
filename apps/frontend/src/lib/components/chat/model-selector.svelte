@@ -5,9 +5,11 @@
 
 	let {
 		model = models[0].id,
+		enabledModelIds,
 		onChange
 	}: {
 		model?: string
+		enabledModelIds?: string[] | null
 		onChange?: (modelId: string) => void
 	} = $props();
 
@@ -43,7 +45,7 @@
 		sideOffset={4}
 		class="w-52 rounded-xl border border-hairline bg-surface-elevated p-1 shadow-none"
 	>
-		{#each models as m (m.id)}
+		{#each models.filter((m) => !enabledModelIds || enabledModelIds.includes(m.id)) as m (m.id)}
 			<button
 				class="flex w-full items-center rounded-lg px-3 py-2 text-xs transition-colors hover:bg-surface-card"
 				style="color: var(--colors-ink)"
