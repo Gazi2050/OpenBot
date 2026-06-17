@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { replaceState } from '$app/navigation';
+import { goto } from '$app/navigation';
 import { models } from 'openbot-sdk';
 import { createChat } from 'openbot-sdk/chat';
 import type { Chat } from '@ai-sdk/svelte';
@@ -60,7 +60,7 @@ function createChatInstance(initialMessages?: UIMessage[]) {
 			}
 			conversationsState.prependConversation(cid, titleFromChat(chat));
 			if (browser && window.location.pathname === '/') {
-				replaceState('/c/' + cid, {});
+				void goto('/c/' + cid, { replaceState: true, noScroll: true, keepFocus: true });
 			}
 		}
 	});

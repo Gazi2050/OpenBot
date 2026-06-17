@@ -9,7 +9,7 @@
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	async function handleDelete() {
-		const id = conversationsState.currentId;
+		const id = conversationsState.currentId ?? $page.url.pathname.split('/')[2];
 		if (!id) return;
 		const isViewingDeletedChat = $page.url.pathname === `/c/${id}`;
 		await conversationsState.remove(id);
@@ -28,7 +28,7 @@
 		class="-ml-1 rounded-lg text-icon-default hover:bg-surface-card [&_svg]:size-5"
 	/>
 	<div class="flex items-center gap-2">
-		{#if $page.url.pathname.startsWith('/c/') && conversationsState.currentId}
+		{#if $page.url.pathname.startsWith('/c/')}
 			<Button
 				variant="ghost"
 				class="h-9 gap-2 rounded-lg border border-hairline bg-surface-elevated px-3 text-sm text-icon-default hover:border-red-500/30 hover:bg-red-500/10 hover:text-red-400"

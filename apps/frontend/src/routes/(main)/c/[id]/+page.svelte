@@ -30,11 +30,12 @@
 		if (loadedId === id) return;
 
 		const status = chatState.chat.status;
-		if (
-			(status === 'submitted' || status === 'streaming') &&
-			conversationsState.currentId &&
-			conversationsState.currentId !== id
-		) {
+		if (status === 'submitted' || status === 'streaming') {
+			// Do not replace chat while generating; this can reset active stream.
+			// If we're already on the same conversation, mark as loaded and keep live state.
+			if (conversationsState.currentId === id) {
+				loadedId = id;
+			}
 			return;
 		}
 
