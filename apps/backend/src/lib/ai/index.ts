@@ -1,1 +1,1 @@
-export { getModel, DEFAULT_MODEL } from './providers.js'
+export { getModel, resolveModelId, DEFAULT_MODEL, availableModelIds } from './providers.js'

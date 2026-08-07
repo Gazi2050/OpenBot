@@ -11,7 +11,7 @@ app.get('/', (c) => {
 })
 
 app.get('/health', (c) => {
-	return c.json({ status: 'ok' })
+	return c.json<ApiResponse<{ status: string }>>({ success: true, data: { status: 'ok' } })
 })
 
 export default app

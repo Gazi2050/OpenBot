@@ -5,7 +5,6 @@
 	import { useClerkContext } from 'svelte-clerk/client';
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
-	import UserRound from '@lucide/svelte/icons/user-round';
 	import LogOut from '@lucide/svelte/icons/log-out';
 
 	let {
@@ -39,15 +38,6 @@
 	</div>
 
 	<Separator class="my-3 bg-hairline" />
-
-	<Button
-		variant="ghost"
-		class="h-10 w-full justify-start gap-3 rounded-md px-4 text-mute-text hover:bg-surface-card hover:text-ink"
-		onclick={() => {}}
-	>
-		<UserRound class="size-[18px] text-icon-default" />
-		<span style="font: var(--type-nav-label)">Profile</span>
-	</Button>
 
 	<Button
 		variant="ghost"

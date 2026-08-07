@@ -4,6 +4,7 @@ import { handle } from 'hono/vercel'
 import { clerkMiddleware } from '@clerk/hono'
 import { logger } from '@openbot/shared'
 import { initDb } from './db/index.js'
+import { errorHandler } from './middleware/error-handler.js'
 import routes from './routes/index.js'
 
 export const config = {
@@ -18,6 +19,7 @@ initDb(process.env.DATABASE_URL)
 const app = new Hono().basePath('/api')
 
 app.use('*', clerkMiddleware())
+app.onError(errorHandler)
 app.route('/', routes)
 
 export default handle(app)

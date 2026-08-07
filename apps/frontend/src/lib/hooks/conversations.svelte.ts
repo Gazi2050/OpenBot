@@ -1,7 +1,8 @@
 import { browser } from '$app/environment';
+import { API_PATHS, STORAGE_KEY, TITLE_MAX_LENGTH } from '$lib/constants.js';
 import type { Conversation, Message } from '@openbot/shared';
 
-const ACTIVE_CONVERSATION_KEY = 'openbot.activeConversationId';
+const ACTIVE_CONVERSATION_KEY = STORAGE_KEY;
 
 class ConversationsState {
 	conversations = $state<Conversation[]>([]);
@@ -47,7 +48,7 @@ class ConversationsState {
 		this.loading = true;
 		this.error = null;
 		try {
-			const res = await fetch('/api/conversations');
+			const res = await fetch(API_PATHS.CONVERSATIONS);
 			if (res.status === 401 && retries > 0) {
 				await new Promise((r) => setTimeout(r, 300));
 				return this.doFetch(retries - 1);
@@ -70,7 +71,7 @@ class ConversationsState {
 		const conv: Conversation = {
 			id,
 			userId: '',
-			title: title.slice(0, 50) || 'New Chat',
+			title: title.slice(0, TITLE_MAX_LENGTH) || 'New Chat',
 			createdAt: now,
 			updatedAt: now
 		};
@@ -79,7 +80,7 @@ class ConversationsState {
 
 	async create(title?: string): Promise<string | null> {
 		try {
-			const res = await fetch('/api/conversations', {
+			const res = await fetch(API_PATHS.CONVERSATIONS, {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ title })
@@ -97,7 +98,7 @@ class ConversationsState {
 
 	async loadConversation(id: string): Promise<Message[]> {
 		try {
-			const res = await fetch(`/api/conversations/${id}`);
+			const res = await fetch(`${API_PATHS.CONVERSATIONS}/${id}`);
 			const json = await res.json();
 			if (!json.success) throw new Error(json.error);
 			this.setCurrentId(id);
@@ -110,7 +111,7 @@ class ConversationsState {
 
 	async remove(id: string) {
 		try {
-			const res = await fetch(`/api/conversations/${id}`, { method: 'DELETE' });
+			const res = await fetch(`${API_PATHS.CONVERSATIONS}/${id}`, { method: 'DELETE' });
 			const json = await res.json();
 			if (!json.success) throw new Error(json.error);
 			this.conversations = this.conversations.filter((c) => c.id !== id);

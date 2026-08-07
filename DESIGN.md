@@ -1,5 +1,7 @@
 # OpenBot — Design System
 
+> **Token implementation:** `apps/frontend/src/routes/layout.css`
+
 ## Overview
 
 OpenBot is a developer-facing chat interface with the visual language of a precision instrument.
@@ -33,61 +35,6 @@ in cards and nav labels runs at ≈ 14–15px regular. No serif. No monospace in
 - Rounded language: cards and input at `{rounded.xl}` (16px), New Chat button at `{rounded.xxl}` (20px), pill selectors at `{rounded.full}`.
 - Sidebar and main area separated by a single `{colors.hairline}` 1px vertical divider — no shadow, no gap.
 - Theme toggle lives in the **sidebar bottom bar only** — not in the top bar.
-
----
-
-## CSS Custom Properties
-
-Paste this block into your `:root` to wire up all tokens immediately.
-
-```css
-:root {
-  /* Accent */
-  --colors-accent-lime: #a8f251;
-  --colors-accent-lime-on: #0e1a00;
-  --colors-accent-blue: #3b82f6;
-
-  /* Surface */
-  --colors-canvas: #141414;
-  --colors-surface-sidebar: #1c1c1c;
-  --colors-surface-card: #222222;
-  --colors-surface-elevated: #2a2a2a;
-  --colors-surface-input: #1e1e1e;
-  --colors-hairline: rgba(255, 255, 255, 0.08);
-  --colors-hairline-strong: rgba(255, 255, 255, 0.14);
-
-  /* Text */
-  --colors-ink: #f5f5f5;
-  --colors-body: rgba(245, 245, 245, 0.82);
-  --colors-mute: rgba(245, 245, 245, 0.5);
-  --colors-placeholder: rgba(245, 245, 245, 0.35);
-  --colors-disabled: rgba(245, 245, 245, 0.22);
-  --colors-icon-default: rgba(245, 245, 245, 0.6);
-  --colors-icon-active: #f5f5f5;
-
-  /* Border Radius */
-  --rounded-none: 0px;
-  --rounded-sm: 6px;
-  --rounded-md: 8px;
-  --rounded-lg: 12px;
-  --rounded-xl: 16px;
-  --rounded-xxl: 20px;
-  --rounded-full: 9999px;
-
-  /* Spacing */
-  --spacing-xs: 4px;
-  --spacing-sm: 8px;
-  --spacing-md: 12px;
-  --spacing-lg: 16px;
-  --spacing-xl: 20px;
-  --spacing-xxl: 24px;
-  --spacing-xxxl: 32px;
-  --spacing-section: 48px;
-
-  /* Typography */
-  --font-primary: "Geist", "Inter Tight", "Inter", system-ui, sans-serif;
-}
-```
 
 ---
 
@@ -146,22 +93,6 @@ labels — uses the same family. Hierarchy is expressed through size, weight, an
 | `{typography.input-placeholder}` | `--type-input-placeholder` | 15px | 400    | 35%     | 1.5         | Input placeholder.                       |
 | `{typography.input-text}`        | `--type-input-text`        | 15px | 400    | 100%    | 1.5         | User-typed message.                      |
 | `{typography.logo}`              | `--type-logo`              | 15px | 600    | 100%    | 1.0         | "OpenBot" wordmark.                      |
-
-### Typography CSS Variables
-
-```css
-:root {
-  --type-welcome-headline: 700 36px/1.2 var(--font-primary);
-  --type-welcome-subtitle: 400 22px/1.3 var(--font-primary);
-  --type-card-title: 600 15px/1.4 var(--font-primary);
-  --type-card-body: 400 13px/1.5 var(--font-primary);
-  --type-nav-label: 500 14px/1 var(--font-primary);
-  --type-button-label: 600 14px/1 var(--font-primary);
-  --type-model-pill: 500 14px/1 var(--font-primary);
-  --type-input-text: 400 15px/1.5 var(--font-primary);
-  --type-logo: 600 15px/1 var(--font-primary);
-}
-```
 
 ### Principles
 

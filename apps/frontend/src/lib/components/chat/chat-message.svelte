@@ -23,7 +23,7 @@
 
 	function getContent(): string {
 		const textPart = msg.parts.find((p) => p.type === 'text');
-		return textPart?.type === 'text' ? textPart.text ?? '' : '';
+		return textPart?.type === 'text' ? (textPart.text ?? '') : '';
 	}
 
 	let content = $derived(getContent());
@@ -82,7 +82,9 @@
 		</div>
 	</div>
 	<div
-		class="{isUser ? 'mr-11' : 'ml-11'} mt-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+		class="{isUser
+			? 'mr-11'
+			: 'ml-11'} mt-1 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
 	>
 		<CopyButton text={content} />
 	</div>

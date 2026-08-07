@@ -1,7 +1,8 @@
 import { browser } from '$app/environment';
 import { goto } from '$app/navigation';
-import { models } from 'openbot-sdk';
-import { createChat } from 'openbot-sdk/chat';
+import { models } from '@openbot/shared';
+import { createChat } from '$lib/chat-transport.js';
+import { API_PATHS, ROUTES, TITLE_MAX_LENGTH } from '$lib/constants.js';
 import type { Chat } from '@ai-sdk/svelte';
 import type { UIMessage } from 'ai';
 import { conversationsState } from './conversations.svelte.js';
@@ -12,12 +13,12 @@ let enabledModelIds = $state<string[] | null>(null);
 function titleFromChat(chat: Chat<UIMessage>) {
 	const lastUser = [...chat.messages].reverse().find((m) => m.role === 'user');
 	const text = lastUser?.parts?.find((p) => p.type === 'text');
-	return (text && 'text' in text ? text.text : undefined)?.slice(0, 50) ?? 'New Chat';
+	return (text && 'text' in text ? text.text : undefined)?.slice(0, TITLE_MAX_LENGTH) ?? 'New Chat';
 }
 
 async function syncModelAvailability(): Promise<void> {
 	try {
-		const res = await fetch('/api/ai/models');
+		const res = await fetch(API_PATHS.MODELS);
 		if (!res.ok) return;
 		const json = await res.json();
 		if (!json?.success || !json?.data) return;
@@ -43,7 +44,7 @@ if (browser) {
 
 function createChatInstance(initialMessages?: UIMessage[]) {
 	const chat = createChat({
-		api: '/api/ai/chat',
+		api: API_PATHS.CHAT,
 		getBody: () => {
 			const body: Record<string, unknown> = { model };
 			if (conversationsState.currentId) {
@@ -60,18 +61,22 @@ function createChatInstance(initialMessages?: UIMessage[]) {
 			}
 			conversationsState.prependConversation(cid, titleFromChat(chat));
 			if (browser && window.location.pathname === '/') {
-				void goto('/c/' + cid, { replaceState: true, noScroll: true, keepFocus: true });
+				void goto(ROUTES.CHAT + cid, { replaceState: true, noScroll: true, keepFocus: true });
 			}
 		}
 	});
 	return chat;
 }
 
-let _chat = $state(createChatInstance());
+let _chat: ReturnType<typeof createChatInstance> | undefined = $state(undefined);
+
+if (browser) {
+	_chat = createChatInstance();
+}
 
 export const chatState = {
 	get chat() {
-		return _chat;
+		return _chat ?? ({ messages: [], status: 'ready' } as unknown as Chat);
 	},
 	get model() {
 		return model;

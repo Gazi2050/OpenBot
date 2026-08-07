@@ -5,7 +5,6 @@
 	import { Button } from '$lib/components/ui/button/index.js';
 	import { chatState } from '$lib/hooks/chat.svelte.js';
 	import { conversationsState } from '$lib/hooks/conversations.svelte.js';
-	import Share from '@lucide/svelte/icons/share';
 	import Trash2 from '@lucide/svelte/icons/trash-2';
 
 	async function handleDelete() {
@@ -39,13 +38,5 @@
 				Delete
 			</Button>
 		{/if}
-		<Button
-			variant="ghost"
-			class="h-9 gap-2 rounded-lg border border-hairline bg-surface-elevated px-3.5 text-sm font-semibold text-ink hover:bg-surface-card"
-			style="background-color: #2a2a2a"
-		>
-			<Share class="size-4 text-icon-default" />
-			Share
-		</Button>
 	</div>
 </header>

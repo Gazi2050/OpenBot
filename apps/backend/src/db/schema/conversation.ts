@@ -1,9 +1,10 @@
 import { pgTable, text, timestamp, varchar } from 'drizzle-orm/pg-core'
+import { DEFAULT_CONVERSATION_TITLE } from '../../lib/constants.js'
 
 export const conversations = pgTable('conversations', {
 	id: text('id').primaryKey(),
 	userId: text('user_id').notNull(),
-	title: varchar('title', { length: 255 }).notNull().default('New Chat'),
+	title: varchar('title', { length: 255 }).notNull().default(DEFAULT_CONVERSATION_TITLE),
 	createdAt: timestamp('created_at').notNull().defaultNow(),
 	updatedAt: timestamp('updated_at').notNull().defaultNow(),
 })

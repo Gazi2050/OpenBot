@@ -93,7 +93,7 @@
 		white-space: nowrap;
 	}
 	:global(.comark-content pre) {
-		background: #1a1a1a;
+		background: var(--colors-canvas);
 		border: 1px solid var(--colors-hairline);
 		border-radius: 8px;
 		padding: 12px 16px;

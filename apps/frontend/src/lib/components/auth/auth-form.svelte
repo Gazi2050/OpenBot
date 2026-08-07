@@ -122,7 +122,11 @@
 	</p>
 
 	{#if step === 'form'}
-		<form onsubmit={handleSubmit} class="flex flex-col gap-4">
+		<form
+			onsubmit={handleSubmit}
+			class="flex flex-col gap-4"
+			aria-describedby={displayError ? 'form-error' : undefined}
+		>
 			<input
 				type="email"
 				bind:value={email}
@@ -134,7 +138,7 @@
 			<PasswordInput bind:value={password} placeholder="Password" required minlength={8} />
 
 			{#if displayError}
-				<p class="text-sm text-red-400">{displayError}</p>
+				<p id="form-error" class="text-sm text-red-400">{displayError}</p>
 			{/if}
 
 			<Button

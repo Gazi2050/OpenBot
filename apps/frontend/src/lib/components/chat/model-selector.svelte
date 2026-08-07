@@ -1,23 +1,19 @@
 <script lang="ts">
 	import * as Popover from '$lib/components/ui/popover/index.js';
 	import ChevronDown from '@lucide/svelte/icons/chevron-down';
-	import { models } from 'openbot-sdk';
+	import { models } from '@openbot/shared';
 
 	let {
 		model = models[0].id,
 		enabledModelIds,
 		onChange
 	}: {
-		model?: string
-		enabledModelIds?: string[] | null
-		onChange?: (modelId: string) => void
+		model?: string;
+		enabledModelIds?: string[] | null;
+		onChange?: (modelId: string) => void;
 	} = $props();
 
-	let selected = $state(models[0].id);
-
-	$effect(() => {
-		selected = model;
-	});
+	let selected = $derived(model);
 
 	let open = $state(false);
 
@@ -30,8 +26,7 @@
 
 <Popover.Popover bind:open>
 	<Popover.PopoverTrigger
-		class="flex h-7 cursor-pointer items-center gap-1.5 rounded-md border border-hairline px-2 text-xs hover:bg-surface-card outline-none focus-visible:ring-2 focus-visible:ring-accent-blue"
-		style="background-color: #2a2a2a; color: var(--colors-ink)"
+		class="flex h-7 cursor-pointer items-center gap-1.5 rounded-md border border-hairline bg-surface-elevated px-2 text-xs outline-none hover:bg-surface-card focus-visible:ring-2 focus-visible:ring-accent-blue"
 	>
 		<span class="flex size-3.5 items-center justify-center rounded-full bg-ink/10">
 			<span class="size-1.5 rounded-full bg-ink/60"></span>

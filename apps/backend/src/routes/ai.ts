@@ -1,17 +1,19 @@
 import { Hono } from 'hono'
 import { getAuth } from '@clerk/hono'
 import { streamText, convertToModelMessages } from 'ai'
-import { eq } from 'drizzle-orm'
-import { getModel, resolveModelId, DEFAULT_MODEL, availableModelIds } from '../lib/ai/providers.js'
-import { SYSTEM_PROMPT } from 'openbot-sdk'
+import type { ApiResponse } from '@openbot/shared'
+import { getModel, resolveModelId, DEFAULT_MODEL, availableModelIds } from '../lib/ai/index.js'
+import { SYSTEM_PROMPT } from '@openbot/shared'
 import { logger } from '@openbot/shared'
 import { getDb } from '../db/index.js'
-import { conversations, messages } from '../db/schema/index.js'
+import { DEFAULT_CONVERSATION_TITLE, TITLE_MAX_LENGTH, ERROR_UNAUTHORIZED } from '../lib/constants.js'
+import { ensureConversation, persistUserMessage } from '../lib/chat/conversations.js'
+import { persistAssistantMessage } from '../lib/chat/persistence.js'
 
 const app = new Hono()
 
 app.get('/models', (c) => {
-	return c.json({
+	return c.json<ApiResponse<{ defaultModelId: string; enabledModelIds: string[] }>>({
 		success: true,
 		data: {
 			defaultModelId: DEFAULT_MODEL,
@@ -25,78 +27,24 @@ app.post('/chat', async (c) => {
 
 	const { userId } = getAuth(c)
 	if (!userId) {
-		return c.json({ success: false, error: 'Unauthorized' }, 401)
+		return Response.json({ success: false, error: ERROR_UNAUTHORIZED }, { status: 401 })
 	}
 	const db = getDb()
-	let conversationId = existingId
 
 	const lastUserMsg = [...uiMessages].reverse().find((m: any) => m.role === 'user')
-	const title = (lastUserMsg?.parts?.[0]?.text ?? 'New Chat').slice(0, 50)
+	const title = (lastUserMsg?.parts?.[0]?.text ?? DEFAULT_CONVERSATION_TITLE).slice(0, TITLE_MAX_LENGTH)
 
-	// If client provided a conversationId, verify it exists and is owned by the user.
-	if (conversationId) {
-		const [conv] = await db
-			.select({ id: conversations.id, userId: conversations.userId })
-			.from(conversations)
-			.where(eq(conversations.id, conversationId))
-			.limit(1)
-		if (!conv || conv.userId !== userId) {
-			logger.warn(
-				`[ai] stale or unauthorized conversationId="${conversationId}" for userId="${userId}", creating new conversation`
-			)
-			conversationId = null
-		}
-	}
+	let { conversationId } = await ensureConversation(db, userId, existingId, title)
 
-	if (!conversationId) {
-		conversationId = crypto.randomUUID()
-		await db.insert(conversations).values({
-			id: conversationId,
+	if (lastUserMsg?.id && lastUserMsg?.parts?.[0]?.text) {
+		conversationId = await persistUserMessage(
+			db,
+			conversationId,
+			lastUserMsg.id,
+			lastUserMsg.parts[0].text,
 			userId,
-			title,
-		})
-	}
-
-	if (conversationId) {
-		if (lastUserMsg?.id && lastUserMsg?.parts?.[0]?.text) {
-			const [existing] = await db
-				.select({ id: messages.id })
-				.from(messages)
-				.where(eq(messages.id, lastUserMsg.id))
-				.limit(1)
-			if (!existing) {
-				// Persist user message; tolerate FK violations (deleted/stale conversation).
-				try {
-					await db.insert(messages).values({
-						id: lastUserMsg.id,
-						conversationId,
-						role: 'user',
-						content: lastUserMsg.parts[0].text,
-					})
-				} catch (e: any) {
-					// 23503 = foreign key violation (conversation deleted or missing)
-					if (e?.cause?.code === '23503' || e?.code === '23503') {
-						logger.warn(
-							`[ai] FK violation persisting user message; creating fresh conversation. staleConversationId="${conversationId}" userId="${userId}"`
-						)
-						conversationId = crypto.randomUUID()
-						await db.insert(conversations).values({
-							id: conversationId,
-							userId,
-							title,
-						})
-						await db.insert(messages).values({
-							id: lastUserMsg.id,
-							conversationId,
-							role: 'user',
-							content: lastUserMsg.parts[0].text,
-						})
-					} else {
-						throw e
-					}
-				}
-			}
-		}
+			title
+		)
 	}
 
 	const effectiveModelId = resolveModelId(modelId)
@@ -121,21 +69,7 @@ app.post('/chat', async (c) => {
 		},
 		onFinish: async ({ text }) => {
 			if (!conversationId || !text) return
-			try {
-				const assistantMsgId = crypto.randomUUID()
-				await db.insert(messages).values({
-					id: assistantMsgId,
-					conversationId,
-					role: 'assistant',
-					content: text,
-				})
-				await db.update(conversations)
-					.set({ updatedAt: new Date() })
-					.where(eq(conversations.id, conversationId))
-			} catch (e) {
-				logger.error(`[ai] failed to persist assistant message for conversation ${conversationId}:`)
-				logger.error(e instanceof Error ? e.message : String(e))
-			}
+			await persistAssistantMessage(db, conversationId, text)
 		},
 	})
 

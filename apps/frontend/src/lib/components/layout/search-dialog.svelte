@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { goto } from '$app/navigation'
+	import { goto } from '$app/navigation';
 	import * as Command from '$lib/components/ui/command/index.js';
 	import { conversationsState } from '$lib/hooks/conversations.svelte.js';
 	import MessageSquare from '@lucide/svelte/icons/message-square';

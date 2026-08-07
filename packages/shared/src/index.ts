@@ -1,20 +1,12 @@
 export * from './logger.js'
+export { models, type Model, type ModelProvider } from './models.js'
+export { SYSTEM_PROMPT } from './system-prompt.js'
 
 export interface ApiResponse<T> {
-  success: boolean
-  data: T
-  error?: string
+	success: boolean
+	data: T
+	error?: string
 }
-
-export interface Bot {
-  id: string
-  name: string
-  status: BotStatus
-  createdAt: Date
-  updatedAt: Date
-}
-
-export type BotStatus = 'online' | 'offline' | 'maintenance'
 
 export interface Conversation {
 	id: string

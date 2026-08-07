@@ -12,6 +12,7 @@
 	import { useClerkContext } from 'svelte-clerk/client';
 	import { chatState } from '$lib/hooks/chat.svelte.js';
 	import { conversationsState } from '$lib/hooks/conversations.svelte.js';
+	import { ROUTES } from '$lib/constants.js';
 	import type { Conversation } from '@openbot/shared';
 	import Bot from '@lucide/svelte/icons/bot';
 	import Search from '@lucide/svelte/icons/search';
@@ -48,7 +49,7 @@
 
 	function handleSelectChat(id: string) {
 		sidebar.setOpenMobile(false);
-		goto('/c/' + id);
+		goto(ROUTES.CHAT + id);
 	}
 
 	async function handleDeleteChat(id: string, e: MouseEvent | KeyboardEvent) {
@@ -97,7 +98,6 @@
 		<Button
 			variant="ghost"
 			class="mb-3 h-11 w-full justify-start gap-2 rounded-lg bg-accent-lime px-4 text-sm font-semibold text-accent-lime-on hover:brightness-[0.92]"
-			style="background-color: #a8f251; color: #0e1a00; border-radius: 12px"
 			onclick={handleNewChat}
 		>
 			<PlusCircle class="size-[18px]" />
@@ -145,7 +145,7 @@
 			<div class="size-8 animate-pulse rounded-full bg-surface-card"></div>
 		{:else if !isSignedIn}
 			<a
-				href="/sign-in"
+				href={ROUTES.SIGN_IN}
 				class="flex h-8 items-center gap-2 rounded-lg px-3 text-sm text-mute-text transition-colors hover:bg-surface-card hover:text-ink"
 			>
 				<LogIn class="size-4 text-icon-default" />

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-OpenBot is a developer-facing chat interface with the visual language of a precision instrument. It is a pnpm monorepo with 3 apps and 2 shared packages, deployed as a SvelteKit frontend + Hono backend (Vercel edge).
+OpenBot is a developer-facing chat interface with the visual language of a precision instrument. It is a pnpm monorepo with 2 apps and 1 shared package, deployed as a SvelteKit frontend + Hono backend (Vercel edge).
 
 **Current state:** Active chat product under development. Frontend includes chat UI, sidebar conversation list, per-conversation route hydration (`/c/[id]`), and delete flows. Backend exposes AI streaming and conversation CRUD routes backed by database tables for conversations and messages.
 
@@ -14,10 +14,8 @@ OpenBot is a developer-facing chat interface with the visual language of a preci
 │                                                          │
 │  apps/frontend ──── SvelteKit 2 + Svelte 5 (runes)      │
 │  apps/backend  ──── Hono 4 (Vercel edge runtime)         │
-│  apps/sdk      ──── OpenBot SDK (dual ESM + CJS)         │
 │                                                          │
-│  packages/database ── Drizzle ORM + Neon PostgreSQL      │
-│  packages/shared  ─── Types, logger, utilities           │
+│  packages/shared  ─── Types, models, logger, utilities   │
 │                                                          │
 │  docker-compose.yml ── PostgreSQL 16 Alpine (local dev)  │
 │  DESIGN.md ──────────── Full design system spec          │
@@ -28,11 +26,9 @@ OpenBot is a developer-facing chat interface with the visual language of a preci
 
 ```
 @openbot/shared (zero runtime deps)
-    ├── @openbot/database (depends on shared)
-    ├── openbot-sdk (depends on shared)
-    └── @openbot/backend (depends on shared + database)
+    └── @openbot/backend (depends on shared)
 
-@openbot/frontend (depends on shared + openbot-sdk)
+@openbot/frontend (depends on shared)
 ```
 
 ## Monorepo Structure
@@ -53,23 +49,18 @@ OpenBot/
 │   │   ├── src/lib/utils.ts  # cn() utility (clsx + tailwind-merge)
 │   │   └── components.json   # shadcn-svelte config (luma style, lucide icons)
 │   │
-│   ├── backend/              # @openbot/backend — Hono 4 API server
-│   │   ├── src/index.ts      # Mounts API routes
-│   │   ├── src/routes/ai.ts  # POST /api/ai/chat (streaming, persists messages)
-│   │   └── src/routes/conversations.ts # CRUD for conversations + message history
-│   │
-│   └── sdk/                  # openbot-sdk — Public npm package
-│       └── src/index.ts      # OpenBotClient class (health, getBots)
+│   └── backend/              # @openbot/backend — Hono 4 API server
+│       ├── src/index.ts      # Mounts API routes
+│       ├── src/db/           # Database connection, schema, Drizzle config
+│       ├── src/lib/          # AI providers, chat helpers, constants
+│       └── src/routes/       # API route handlers
 │
 └── packages/
-    ├── database/             # @openbot/database — Drizzle ORM + Neon
-    │   ├── src/connection.ts  # createClient(connectionString) factory
-    │   ├── src/schema/bot.ts  # bots table (id, name, status, timestamps)
-    │   └── drizzle.config.ts  # PostgreSQL dialect, ./src/schema/index.ts
-    │
     └── shared/               # @openbot/shared — Zero runtime deps
-        ├── src/index.ts       # ApiResponse<T>, Bot, BotStatus types
-        └── src/logger.ts      # ANSI-colored CLI logger
+        ├── src/index.ts      # ApiResponse<T>, Conversation, Message types
+        ├── src/models.ts     # Model definitions (Google, Groq, Ollama)
+        ├── src/system-prompt.ts # AI system prompt
+        └── src/logger.ts     # ANSI-colored CLI logger
 ```
 
 ## Tech Stack
@@ -89,7 +80,7 @@ OpenBot/
 | Package Manager | pnpm (workspaces) | — |
 | Build Tool (packages) | tsup (dual ESM + CJS + d.ts) | `^8.x` |
 | TypeScript | Strict mode, `verbatimModuleSyntax` | `^5.8` / `^6.0` |
-| Font | Inter Variable via `@fontsource-variable/inter` | — |
+| Font | Geist (via Google Fonts) | — |
 | Icons | `@lucide/svelte` | `^1.17.0` |
 
 ## Common Commands
@@ -104,9 +95,8 @@ pnpm dev:backend      # Backend only (tsx watch)
 
 # Build (ORDER MATTERS: packages must build before apps)
 pnpm build            # pnpm build:packages && pnpm build:apps
-pnpm build:packages   # @openbot/shared + @openbot/database + openbot-sdk
+pnpm build:packages   # @openbot/shared
 pnpm build:apps       # @openbot/backend + @openbot/frontend
-pnpm build:sdk        # openbot-sdk only
 
 # Type checking
 pnpm typecheck        # Runs svelte-check (frontend) and tsc --noEmit (others)
@@ -138,7 +128,7 @@ pnpm clean            # Remove all dist/ and node_modules/
 ### TypeScript
 
 - `strict: true` everywhere
-- Backend/packages/sdk: `module: "NodeNext"`, `moduleResolution: "NodeNext"`
+- Backend/shared: `module: "NodeNext"`, `moduleResolution: "NodeNext"`
 - Frontend: `moduleResolution: "bundler"`, extends `.svelte-kit/tsconfig.json` (NOT `tsconfig.base.json`)
 - Backend has `jsx: "react-jsx"`, `jsxImportSource: "hono/jsx"` for Hono's JSX middleware
 
@@ -149,7 +139,7 @@ pnpm clean            # Remove all dist/ and node_modules/
 
 ### Build
 
-- Packages (shared, database, sdk) build with tsup: dual ESM + CJS + TypeScript declarations
+- Package (shared) builds with tsup: dual ESM + CJS + TypeScript declarations
 - tsup config pattern: `entry: ['src/index.ts']`, `format: ['esm', 'cjs']`, `dts: true`, `clean: true`
 - Frontend builds with Vite via SvelteKit
 
@@ -190,23 +180,23 @@ Full spec lives in `DESIGN.md` (419 lines). Key rules:
 | Border radius | Cards/inputs: 16px, New Chat button: 20px, pills: 9999px |
 | Theme toggle | Sidebar bottom bar only — never in top bar |
 
-**Important gap:** The current `layout.css` uses shadcn-svelte's default oklch color tokens, which differ from DESIGN.md's hex/rgba custom properties. These need to be reconciled when implementing the design system.
+**Token implementation:** See `apps/frontend/src/routes/layout.css` for the current CSS custom property definitions.
 
 ## Database Conventions
 
 - **ORM:** Drizzle (`drizzle-orm/pg-core`)
 - **Driver:** `@neondatabase/serverless` HTTP driver via `drizzle-orm/neon-http` (not TCP pooling)
-- **Schema directory:** `packages/database/src/schema/`
-- **Schema barrel:** `packages/database/src/schema/index.ts` re-exports all tables
-- **Connection factory:** `createClient(connectionString)` in `packages/database/src/connection.ts`
-- **Migrations config:** `packages/database/drizzle.config.ts` — PostgreSQL dialect, output `./drizzle/`
-- **Drizzle Kit commands:** run via root scripts (`pnpm db:generate`, `pnpm db:push`, etc.)
-- **Current schema:** single `bots` table — `id` (text PK), `name` (varchar 255), `status` (varchar 50, default `'offline'`), `created_at`, `updated_at` (timestamps)
+- **Location:** `apps/backend/src/db/` (connection, schema, Drizzle config)
+- **Schema:** `apps/backend/src/db/schema/` — `index.ts` re-exports all tables
+- **Connection:** `createClient(connectionString)` in `apps/backend/src/db/connection.ts`
+- **Drizzle config:** `apps/backend/drizzle.config.ts` — PostgreSQL dialect, schema from `./src/db/schema/index.ts`
+- **Drizzle Kit:** run via root scripts (`pnpm db:generate`, `pnpm db:push`, etc.)
+- **Current schema:** `conversations` (id, userId, title, timestamps) + `messages` (id, conversationId FK, role, content, timestamps)
 
 ### Adding a new table
 
-1. Create `packages/database/src/schema/<name>.ts` using `pgTable` from `drizzle-orm/pg-core`
-2. Re-export from `packages/database/src/schema/index.ts`
+1. Create `apps/backend/src/db/schema/<name>.ts` using `pgTable` from `drizzle-orm/pg-core`
+2. Re-export from `apps/backend/src/db/schema/index.ts`
 3. Run `pnpm db:generate` to create migration
 4. Run `pnpm db:push` to apply (dev) or `pnpm db:migrate` (production)
 
@@ -218,7 +208,7 @@ Full spec lives in `DESIGN.md` (419 lines). Key rules:
 - Main stylesheet: `src/routes/layout.css` (NOT `app.css`)
 - Custom dark variant: `@custom-variant dark (&:is(.dark *))`
 - Theme variables in `@theme inline {}` block
-- Imports: `tw-animate-css`, `shadcn-svelte/tailwind.css`, `@fontsource-variable/inter`
+- Imports: `tw-animate-css`, `shadcn-svelte/tailwind.css`
 
 ### shadcn-svelte
 
@@ -256,14 +246,20 @@ The frontend proxies `/api` requests to the Hono backend:
   - `POST /api/conversations` (create conversation)
   - `GET /api/conversations/:id` (conversation + message history)
   - `DELETE /api/conversations/:id` (delete conversation)
-- **Database usage:** Backend routes actively use `@openbot/database` for conversations/messages persistence.
+- **Database usage:** Backend routes use `apps/backend/src/db/` for conversations/messages persistence.
 
 ### Adding a new route
 
-1. Add route handler in `apps/backend/src/index.ts` on the `app` instance
+1. Add route handler in `apps/backend/src/routes/` and mount in `apps/backend/src/routes/index.ts`
 2. Return typed `ApiResponse<T>` using `c.json<ApiResponse<T>>()`
-3. Add corresponding method to `OpenBotClient` in `apps/sdk/src/index.ts`
-4. Re-export any new types from `@openbot/shared`
+3. Re-export any new types from `@openbot/shared`
+
+## Authentication
+
+- **Provider:** Clerk (`svelte-clerk` on frontend, `@clerk/hono` on backend)
+- **Backend:** `clerkMiddleware()` applied globally in `src/index.ts`, routes check auth via `getAuth(c)`
+- **Frontend:** `ClerkProvider` wraps root layout, `handleClerk()` in `hooks.server.ts`
+- **Env vars:** `CLERK_SECRET_KEY`, `CLERK_PUBLISHABLE_KEY`, `PUBLIC_CLERK_*`
 
 ## Frontend Chat State Flow
 
@@ -278,7 +274,7 @@ The frontend proxies `/api` requests to the Hono backend:
 
 ## Known Pitfalls (Important)
 
-- **Do not pass transport body via accessor getter at initialization** in `apps/sdk/src/chat.ts`.
+- **Do not pass transport body via accessor getter at initialization** in `apps/frontend/src/lib/chat-transport.ts`.
   - Bad pattern: `get body() { return opts.getBody?.() ?? {} }`
   - This can freeze an initial body value in transport setup and miss updated `conversationId` on later sends.
   - Use a dynamic resolvable body function (`body: opts.getBody`) so body is evaluated per request.
@@ -292,7 +288,6 @@ The frontend proxies `/api` requests to the Hono backend:
 | Frontend UI | Chat UI, sidebar, per-conversation route hydration, and delete flows implemented |
 | Backend API | Health + AI chat + conversations CRUD routes implemented |
 | Database | Conversations/messages tables used by backend routes |
-| SDK | Includes chat transport helper (`apps/sdk/src/chat.ts`) used by frontend |
 | Design tokens | `layout.css` uses shadcn defaults, not DESIGN.md tokens |
 | Tests | No dedicated automated chat-flow tests yet (manual verification still required) |
 | CI/CD | None — no GitHub Actions or deployment pipeline |
@@ -368,7 +363,7 @@ When the user says:
 - `"how does X relate to Y"` → `graphify path "X" "Y"` → explain from graph
 - `"review my code"` → `requesting-code-review` → cross-reference graph for missed connections
 - `"build a settings page"` → `graphify query "settings"` → `brainstorming` → `svelte-code-writer` + `svelte5-best-practices` → implement → `graphify update .`
-- `"add a new database table"` → `graphify query "schema"` → `drizzle` + `neon-postgres` → implement → `graphify update .`
+- `"add a new database table"` → `graphify query "schema"` → `drizzle` + `neon-postgres` → implement in `apps/backend/src/db/schema/` → `graphify update .`
 - `"create a new API route"` → `graphify query "backend"` → `hono` → implement → `graphify update .`
 - `"make it accessible"` → `graphify query` affected area → `accessibility` → fix → `graphify update .`
 - `"optimize the monorepo build"` → `graphify query "build"` → `monorepo-management` → fix → `graphify update .`

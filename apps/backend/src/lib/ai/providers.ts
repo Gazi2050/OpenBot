@@ -2,11 +2,11 @@ import { google } from '@ai-sdk/google'
 import { groq } from '@ai-sdk/groq'
 import { createOllama } from 'ollama-ai-provider-v2'
 import type { LanguageModel } from 'ai'
-import { models } from 'openbot-sdk'
+import { models } from '@openbot/shared'
 import { logger } from '@openbot/shared'
 
 const ollama = createOllama({
-	baseURL: 'https://ollama.com/api',
+	baseURL: process.env.OLLAMA_BASE_URL || 'https://ollama.com/api',
 	headers: process.env.OLLAMA_API_KEY
 		? { Authorization: `Bearer ${process.env.OLLAMA_API_KEY}` }
 		: undefined,
