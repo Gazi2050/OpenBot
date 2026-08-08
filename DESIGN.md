@@ -4,7 +4,7 @@
 
 ## Overview
 
-OpenBot is a developer-facing chat interface with the visual language of a precision instrument.
+OpenBot is a general-purpose AI chatbot with the visual language of a precision instrument.
 Every surface opens on `{colors.canvas}` (`#141414`), a near-black warmer than pure black, giving
 the UI a soft depth that pure `#000000` cannot achieve. The loudest element is not a brand stamp
 or a hero headline — it is the **lime-green New Chat button** (`{colors.accent-lime}` — `#a8f251`),

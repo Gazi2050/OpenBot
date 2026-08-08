@@ -1,6 +1,6 @@
 # OpenBot — Full Feature Documentation
 
-OpenBot is a developer-facing AI chat application with the visual language of a precision instrument. It is a **pnpm monorepo** with two deployable apps and one shared package: a SvelteKit frontend and a Hono backend, both deployed to Vercel (Edge / Node serverless), backed by PostgreSQL (Neon) and authenticated by Clerk.
+OpenBot is a general-purpose AI chatbot with the visual language of a precision instrument. It is a **pnpm monorepo** with two deployable apps and one shared package: a SvelteKit frontend and a Hono backend, both deployed to Vercel (Edge / Node serverless), backed by PostgreSQL (Neon) and authenticated by Clerk.
 
 This document describes **every feature** in the project, end to end, with file references.
 

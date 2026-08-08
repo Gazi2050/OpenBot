@@ -2,7 +2,7 @@
   <img src="apps/frontend/src/lib/assets/openbot.png" alt="OpenBot" width="220" />
 </p>
 
-> ### **OpenBot** is a developer-focused AI chat client for streaming conversations across multiple models.
+> ### **OpenBot** is a general-purpose, multi-model AI chatbot for streaming and continuing conversations across providers.
 
 ## 🔑 Key features
 

@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-OpenBot is a developer-facing chat interface with the visual language of a precision instrument. It is a pnpm monorepo with 2 apps and 1 shared package, deployed as a SvelteKit frontend + Hono backend (Vercel edge).
+OpenBot is a general-purpose AI chatbot with the visual language of a precision instrument. It is a pnpm monorepo with 2 apps and 1 shared package, deployed as a SvelteKit frontend + Hono backend (Vercel edge).
 
 **Current state:** Active chat product under development. Frontend includes chat UI, sidebar conversation list, per-conversation route hydration (`/c/[id]`), and delete flows. Backend exposes AI streaming and conversation CRUD routes backed by database tables for conversations and messages.
 
