@@ -36,6 +36,7 @@ Copy from `.env.example` and set:
 # ---- Backend ----
 DATABASE_URL=
 PORT=3000
+# CLERK_SECRET_KEY also need in frontend too
 CLERK_SECRET_KEY=
 CLERK_PUBLISHABLE_KEY=
 GOOGLE_GENERATIVE_AI_API_KEY=
