@@ -39,7 +39,3 @@ pnpm-debug.log*
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-
-graphify-out
-.opencode
-.commandcode
