@@ -1,7 +1,9 @@
+export const API_BASE = '';
+
 export const API_PATHS = {
-	CHAT: '/api/ai/chat',
-	MODELS: '/api/ai/models',
-	CONVERSATIONS: '/api/conversations'
+	CHAT: `${API_BASE}/api/ai/chat`,
+	MODELS: `${API_BASE}/api/ai/models`,
+	CONVERSATIONS: `${API_BASE}/api/conversations`
 } as const;
 
 export const ROUTES = {

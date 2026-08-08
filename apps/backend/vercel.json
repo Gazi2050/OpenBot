@@ -1,5 +1,4 @@
 {
-  "buildCommand": "cd ../.. && pnpm build:packages && pnpm --filter @openbot/backend build",
-  "outputDirectory": "dist",
-  "installCommand": "cd ../.. && pnpm install"
+  "buildCommand": "pnpm --filter @openbot/shared build",
+  "installCommand": "pnpm install"
 }
